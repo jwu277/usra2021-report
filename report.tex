@@ -1,0 +1,250 @@
+%% Standard start of a latex document
+\documentclass[letterpaper,12pt]{article}
+%% Always use 12pt - it is much easier to read
+%% Things written after '%' sign, are ignored by the latex editor - they are how to introduce comments into your .tex source
+%% Anything mathematics related should be put in between '$' signs.
+
+%% Set some names and numbers here so we can use them below
+\newcommand{\name}{James Wu}
+
+%%%%%%
+%% There is a bit of stuff below which you should not have to change
+%%%%%%
+
+%% AMS mathematics packages - they contain many useful fonts and symbols.
+\usepackage{amsmath, amsfonts, amssymb, bm}
+
+%% The geometry package changes the margins to use more of the page, I suggest
+%% using it because standard latex margins are chosen for articles and letters,
+%% not homework.
+\usepackage[paper=letterpaper,left=25mm,right=25mm,top=30mm,bottom=30mm]{geometry}
+%% For details of how this package work, google the ``latex geometry documentation''.
+
+%% Fancy headers and footers - make the document look nice
+\usepackage{fancyhdr} %% for details on how this work, search-engine ``fancyhdr documentation''
+\pagestyle{fancy}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\setlength{\headheight}{15pt}
+
+%% These put horizontal lines between the main text and header and footer.
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+%%%
+
+%%%%%%
+%% The above stuff is the same as the first template, but now we are starting to prove things, so we'd like to have a
+%% good proof environment that gives us nice formatting and a little square at the end.
+%% We'd also like a nice Result environment that prints that up nicely too.
+%% Thankfully this exists in latex in the amsthm package
+\usepackage{amsthm}
+\newtheorem*{thm}{Theorem}
+%% This creates a new theorem-like environment called "result", that will be titled "Result".
+%% See below for examples of how to use this.
+%%%%%%
+\usepackage{enumitem}
+%% This package allows us to make nice ordered lists with numbers, letters or roman numerals
+
+\usepackage{titlesec}
+\titlespacing*{\subsection}{0pt}{0pt}{3.0ex}
+\titlespacing*{\subsubsection}{0pt}{3.0ex}{0.5ex}
+
+\usepackage[hang,flushmargin]{footmisc}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0.5em}
+
+\allowdisplaybreaks
+
+\renewcommand{\arraystretch}{1.4}
+
+\usepackage{empheq}
+
+\newcommand*\wfbox[1]{\fbox{\hspace{0.4em}#1\hspace{0.4em}}}
+\numberwithin{table}{section}
+\numberwithin{figure}{section}
+\numberwithin{equation}{section}
+
+%% Useful commands
+\renewcommand*{\qed}{\hfill\ensuremath{\square}}
+
+\newcommand*{\uvec}[1]{\hat{\bm{#1}}}
+
+\newcommand*{\deriv}[2]{\frac{d #1}{d #2}}
+\newcommand*{\pderiv}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand*{\nderiv}[3]{\frac{d^{#3} #1}{d #2^{#3}}}
+\newcommand*{\npderiv}[3]{\frac{\partial^{#3} #1}{\partial #2^{#3}}}
+\newcommand*{\divg}[1]{\nabla \cdot \mathbf{#1}}
+\newcommand*{\curl}[1]{\nabla \times \mathbf{#1}}
+
+\newcommand*{\abs}[1]{\left| #1 \right|}
+\newcommand*{\norm}[1]{\abs{\abs{\mathbf{#1}}}}
+
+\newcommand*{\ev}[1]{\left<#1\right>}
+
+\renewcommand*{\Re}[1]{\text{Re}\left(#1\right)}
+\renewcommand*{\Im}[1]{\text{Im}\left(#1\right)}
+
+\newcommand*{\qimg}[2]{\\ \begin{center}\includegraphics[scale=#1]{#2}\end{center}}
+
+\newcommand*{\Arg}[1]{\text{Arg}\left(#1\right)}
+\newcommand*{\Log}[1]{\text{Log}\left(#1\right)}
+\newcommand*{\Tr}[1]{\text{Tr}\left(#1\right)}
+
+\newcommand*{\ket}[1]{\left|#1\right>}
+\newcommand*{\bra}[1]{\left<#1\right|}
+\newcommand*{\braket}[2]{\left<#1\right|\left.\!#2\right>}
+\newcommand*{\comm}[2]{\left[#1, #2\right]}
+
+% LaTeX
+\newcommand{\fig}[2]{\includegraphics[width=#1\textwidth]{img/#2}}
+\newcommand{\centerfig}[2]{\begin{center}\includegraphics[width=#1\textwidth]{img/#2}\end{center}}
+\def\items#1{\begin{itemize}#1\end{itemize}}
+\def\enum#1{\begin{enumerate}#1\end{enumerate}}
+\newcommand{\ccaption}[1]{\caption{\textit{#1}}}
+
+% References
+\newcommand{\reffig}[1]{\textbf{Figure \ref{#1}}}
+\newcommand{\reftab}[1]{\textbf{Table \ref{#1}}}
+
+%%
+
+\begin{document}
+\begin{flushleft}
+
+    % TODO title page, etc.
+    % TODO header, footer formatting
+
+    \section{Preface}
+    % TODO
+
+    \section{Code Usage}
+    % TODO
+
+    \section{Morris-Lecar Neuron}
+    
+    \subsection{Circuit Model}
+
+    % ML intro
+    The Morris-Lecar description \cite{ml} models a neuron as having a membrane potential $v$, defined to be the difference in voltage between the inside and outside of the neuron cell. Current flows through potassium and calcium channels in the membrane, labelled as $I_K$ and $I_{Ca}$, respectively. There is also some current arising form other ions, which is collectively totalled as the leak current $I_L$. The combined potassium, calcium, and leak channels each have an effective conductance (or, taking reciprocals, resistance) and potential. Finally, the membrane has a capacitance $C$. \reffig{fig:ml-circuit} depicts a circuit for this model.
+
+    % ML neuron circuit
+    \begin{figure}
+
+        \centering
+    
+        \centerfig{0.6}{ml-circuit.jpg}
+        \caption{TODO + cite ML}
+    
+        \label{fig:ml-circuit}
+    
+    \end{figure}
+
+    % ML circuit equation
+    Consequently, the membrane potential obeys the following first order differential equation:
+    \begin{equation}
+        C\deriv{v}{t} = I - g_K (v - V_K) - g_{Ca} (v - V_{Ca}) - g_L (v - V_L)
+        \label{eqn:ml-circuit}
+    \end{equation}
+
+    % ML conductances
+    Nominally, the potassium and calcium conductances are non-constant. Rather, they obey the following equations:
+    \begin{align}
+        g_K &= \bar{g}_K w \\
+        g_{Ca} &= \bar{g}_{Ca} m
+    \end{align}
+    where $\bar{g}_K, \bar{g}_{Ca}$ are constant.
+    
+    % ML voltage gating variables
+    At constant $v$, the parameters $x = w, m$ are governed by first order differential equations of the following form:
+    \begin{equation}
+        \label{eqn:ml-voltage-gating}
+        \deriv{x}{t} = \lambda_x(v) (x_\infty(v) - x)
+    \end{equation}
+    
+    % ML voltage gating vars simplification
+    However, the $m$ timescale is much shorter than the $w$ timescale, so that $m \approx m_\infty(v)$ in (\ref{eqn:ml-circuit}). Furthermore, to be consistent with \cite{snm}, we may re-arrange the $x = w$ version of (\ref{eqn:ml-voltage-gating}) to be of the following form:
+    \begin{equation}
+        \deriv{w}{t} = \alpha(v)(1  - w) - \beta(v)w
+    \end{equation}
+    where
+    \begin{align}
+        \alpha(v) &= \frac{1}{2} \phi \cosh{\left(\frac{v - V_3}{2V_4}\right)}\left(1 + \tanh{\left(\frac{v - V_3}{V_4}\right)}\right) \\
+        \beta(v) &= \frac{1}{2} \phi \cosh{\left(\frac{v - V_3}{2V_4}\right)}\left(1 - \tanh{\left(\frac{v - V_3}{V_4}\right)}\right)
+    \end{align}
+    Furthermore, we have
+    \begin{equation}
+        m_\infty(v) = \frac{1}{2}\left(1 + \tanh{\left(\frac{v - V_1}{V_2}\right)}\right)
+    \end{equation}
+
+    \subsection{Morris-Lecar Parameters}
+
+    % Parameters table
+    The following parameters from \cite{snm} were used in this project:
+    \begin{table}
+    
+        \centering
+    
+        \begin{adjustbox}{max width=\textwidth}
+    
+            \begin{tabular} { | c | c | c | }
+                \hline
+                Variable & Value & Units \\
+                \hline\hline
+                $C$ & 20 & $\mu F/cm^2$ \\
+                \hline
+                $g_L$ & 2.0 & $mS/cm^2$ \\
+                \hline
+                $\bar{g}_{Ca}$ & 4.4 & $mS/cm^2$ \\
+                \hline
+                $\bar{g}_K$ & 8 & $mS/cm^2$ \\
+                \hline
+                $V_L$ & -60 & $mV/cm^2$ \\
+                \hline
+                $V_{Ca}$ & 120 & $mV/cm^2$ \\
+                \hline
+                $V_K$ & -84 & $mV/cm^2$ \\
+                \hline
+                $V_1$ & -1.2 & $mV/cm^2$ \\
+                \hline
+                $V_2$ & 18.0 & $mV/cm^2$ \\
+                \hline
+                $V_3$ & 2.0 & $mV/cm^2$ \\
+                \hline
+                $V_4$ & 30.0 & $mV/cm^2$ \\
+                \hline
+                $\phi$ & 0.04 & dimensionless \\
+                \hline
+            \end{tabular}
+    
+        \end{adjustbox}
+    
+        \caption{TODO}
+        
+        \label{tab:2}
+    
+    \end{table}
+
+    \section{Dynamics}
+
+    \section{Stochastics}
+
+    \section{Interspike Intervals}
+
+    \section{Linearized Model}
+
+    \section{Poincare-Like Maps}
+
+    \section{Patched Model}
+
+    \section{Next Steps}
+
+    \pagebreak
+
+    \bibliographystyle{plain}
+    \bibliography{bibliography.bib}
+
+\end{flushleft}
+\end{document}
