@@ -121,9 +121,20 @@
     % TODO header, footer formatting
 
     \section{Preface}
+
+    \subsection{Context}
+
+    \subsection{Acknowledgements}
+
+    \subsection{Contact Me}
     % TODO
 
     \section{Code Usage}
+
+    \subsection{Code Structure}
+
+    \subsection{Running Scripts}
+
     % TODO
 
     \section{Morris-Lecar Neuron}
@@ -177,7 +188,9 @@
     \end{equation}
     where
     \begin{align}
+        \label{eqn:alpha-def}
         \alpha(v) &= \frac{1}{2} \phi \cosh{\left(\frac{v - V_3}{2V_4}\right)}\left(1 + \tanh{\left(\frac{v - V_3}{V_4}\right)}\right) \\
+        \label{eqn:beta-def}
         \beta(v) &= \frac{1}{2} \phi \cosh{\left(\frac{v - V_3}{2V_4}\right)}\left(1 - \tanh{\left(\frac{v - V_3}{V_4}\right)}\right)
     \end{align}
     Furthermore, we have
@@ -188,7 +201,7 @@
     \subsection{Morris-Lecar Parameters}
 
     % Parameters table
-    The following parameters from \cite{snm} were used in this project:
+    The parameters from \cite{snm} used in this project are given in \reftab{tab:ml-param}. Sometimes $I$ and/or $phi$ are varied to assess the bifurcational behaviuor of the system.
     \begin{table}
     
         \centering
@@ -207,21 +220,23 @@
                 \hline
                 $\bar{g}_K$ & 8 & $mS/cm^2$ \\
                 \hline
-                $V_L$ & -60 & $mV/cm^2$ \\
+                $V_L$ & -60 & $mV$ \\
                 \hline
-                $V_{Ca}$ & 120 & $mV/cm^2$ \\
+                $V_{Ca}$ & 120 & $mV$ \\
                 \hline
-                $V_K$ & -84 & $mV/cm^2$ \\
+                $V_K$ & -84 & $mV$ \\
                 \hline
-                $V_1$ & -1.2 & $mV/cm^2$ \\
+                $V_1$ & -1.2 & $mV$ \\
                 \hline
-                $V_2$ & 18.0 & $mV/cm^2$ \\
+                $V_2$ & 18.0 & $mV$ \\
                 \hline
-                $V_3$ & 2.0 & $mV/cm^2$ \\
+                $V_3$ & 2.0 & $mV$ \\
                 \hline
-                $V_4$ & 30.0 & $mV/cm^2$ \\
+                $V_4$ & 30.0 & $mV$ \\
                 \hline
-                $\phi$ & 0.04 & dimensionless \\
+                $\phi$ & 0.04 & $ms^{-1}$ \\
+                \hline
+                $I$ & 90 & $\mu A/cm^2$ \\
                 \hline
             \end{tabular}
     
@@ -229,7 +244,7 @@
     
         \caption{TODO}
         
-        \label{tab:2}
+        \label{tab:ml-param}
     
     \end{table}
 
@@ -380,13 +395,15 @@
     \end{equation}
     As a system of stochastic differential equations, we have
     \begin{align}
+        \label{eqn:ml-stochastic}
         \qvec{v}{w}' &= \qvec{f(v, w)}{g(v, w)} dt + \qmat{0}{0}{0}{h(v, w)} \mathbf{dB_t} \\
         f(v, w) &= \frac{I - \bar{g}_K w (v - V_K) - \bar{g}_{Ca} m_\infty(v) (v - V_{Ca}) - g_L (v - V_L)}{C} \\
         g(v, w) &= \alpha(v) (1 - w) - \beta(v) w \\
+        \label{eqn:ml-stochastic-end}
         h(v, w) &= \frac{1}{\sqrt{N_K}}\sqrt{\alpha(v) (1 - w) + \beta(v) w}
     \end{align}
 
-    \subsection{Euler-Maruyama}
+    \subsection{Euler-Maruyama Method}
 
     % General description
     The Euler-Maruyama method is a generalization of the Euler method to stochastic differential equations of the form (\ref{eqn:sde-general}). Here, a small finite time increment $dt$ is chosen. Then, starting from an initial condition $\mathbf{X}(0)$, we iteratively compute
@@ -407,17 +424,111 @@
 
     \subsection{Results}
 
+    \section{Poincare-Like Maps} % TODO change name?
+    % TODO
+
     \section{Alternative Dynamics}
 
     \subsection{Jacobi Dynamics}
 
+    % Motivation
+    Physically, $w$ should be bounded in $[0, 1]$. However, the equations described in (\ref{eqn:ml-stochastic})-(\ref{eqn:ml-stochastic-end}) imply a finite (albeit small) possibility of $w$ being outside of $[0, 1]$. \textit{In practice}, this issue never really manifests. For theoretical satisfaction, however, we may instead use--for a fixed $v$--a bounded diffusion process for $w$.
+
+    % Jacobi diffusion
+    Following \cite{dg}, we choose the simplest diffusion process that mimics the system. Arguably, we wish to preserve the dynamic part $g(v, w)$ while having as simple of a variance coefficient $h(v, w)^2$ as possible. The preservation of $g(v, w)$ can be vouched for as it, loosely speaking, determines the ``average'' behaviour of the system, as well as defining the $N_K \to 0$ limit behaviour. Seeing that $g(v, w)$ is linear in $w$, we consider Pearson diffusions, where $h(v, w)^2$ is a polynomial of degree at most two. It turns out that the Jacobi diffusion is the only Pearson diffusion bounded in a finite interval. This renders a Jacobi diffusion as the ``simplest'' bounded diffusion process appropriate for the stochastic Morris-Lecar system.
+
+    % Ergodicity
+    We follow the discussion \cite{dg} on the Jacobi diffusion here. The Jacobi diffusion bounded on $(0, 1)$ has the form (for fixed $v$)
+    \begin{equation}
+        \label{eqn:w-jacobi-base}
+        dw = -\theta (w - \mu) dt + \gamma\sqrt{2\theta w (1 - w)} dB_t
+    \end{equation}
+    Equating the dynamic part gets us
+    \begin{equation}
+        \theta = \alpha + \beta, \quad \mu = \frac{\alpha}{\alpha + \beta}
+    \end{equation}
+    Note that we necessarily have $\alpha(v), \beta(v) \geq 0$ as can be seen from (\ref{eqn:alpha-def})-(\ref{eqn:beta-def}). The Jacobi diffusion is \textit{ergodic} for
+    \begin{equation}
+        \label{eqn:jacobi-ergodic-condition}
+        \gamma^2 \leq \mu, 1 - \mu
+    \end{equation}
+    To retain this property, we can rewrite $\gamma = \sigma^* \delta(v)$, where $\sigma^*$ is a constant that can be fit (to e.g. match $h(v, w)$ at the fixed point) and $\delta(v)$ is a simple function of $v$. Of course, such a choice of $\sigma^*, \delta(v)$ is not unique since we can rewrite $\sigma^* \mapsto x\sigma^*$, $\delta(v) \mapsto \frac{\delta(v)}{x}$ for any nonzero $x$. We therefore assert the condition that $\sigma^* \in [0, 1]$ and that (\ref{eqn:jacobi-ergodic-condition}) holds for all $\sigma^*$ in that range. When fitting $\sigma^*$, the ergodicity requirement becomes verifying that $\sigma^* \in [0, 1]$.
+
+    % Jacobi parameters
+    $\gamma^2$ is largest when $\sigma^* = 1$, so our task becomes assuring that $\delta(v)^2 \leq \mu, 1 - \mu$ i.e.
+    \begin{equation}
+        \delta(v)^2 \leq \frac{\alpha(v)}{\alpha(v) + \beta(v)}, \frac{\beta(v)}{\alpha(v) + \beta(v)}
+    \end{equation}
+    Naively, we could define
+    \begin{equation}
+        \delta(v) = \sqrt{\min{\left(\frac{\alpha(v)}{\alpha(v) + \beta(v)}, \frac{\beta(v)}{\alpha(v) + \beta(v)}\right)}}
+    \end{equation}
+    However, the piecewise definition comes at the cost of differentiability. To make $\delta(v)$ analytically ``well-behaved'', we instead define $\delta(v)^2$ to be the harmonic sum of $\mu, 1 - \mu$ (as is done for e.g. parallel resistors):
+    \begin{equation}
+        \delta(v)^2 = \frac{\mu(1 - \mu)}{\mu + (1 - \mu)} = \frac{\alpha\beta}{\alpha + \beta}
+    \end{equation}
+    Thus
+    \begin{equation}
+        \gamma = \sigma^* \sqrt{\frac{\alpha\beta}{\alpha + \beta}}
+    \end{equation}
+    Equation (\ref{eqn:w-jacobi-base}) now becomes
+    \begin{equation}
+        \label{eqn:w-jacobi}
+        dw = (\alpha(v) (1 - w) - \beta(v) w) dt + \sigma^* \sqrt{2\frac{\alpha(v)\beta(v)}{\alpha(v) + \beta(v)} w(1-w)} dB_t
+    \end{equation}
+
+    % sigma* fitting
+    The fixed point of the system occurs at approximately $(v_{eq}, w_{eq}) = (-26.6, 0.129)$. Plugging this into (\ref{eqn:ml-stochastic-end}) and the coefficient in front of $dB_t$ in (\ref{eqn:w-jacobi}) gives
+    \begin{equation}
+        \label{eqn:h-eq}
+        h(v_{eq}, w_{eq}) = \frac{0.1003}{\sqrt{N_K}} = 0.03365\sigma^*
+    \end{equation}
+    That gives us
+    \begin{equation}
+        \sigma^* = \frac{2.98}{\sqrt{N_K}}
+    \end{equation}
+    Since $N_K$ is on the order of $1000$, and certainly larger than $9$, we see that typical fits of $\sigma^*$ are indeed ergodic.
+
     \subsection{Linearized Dynamics}
+    
+    % Linear equation
+    Near the fixed point, we can expand (\ref{eqn:ml-stochastic}) as a linear model as in \cite{dg}. Since the deterministic part is zero to zeroth order, we expand it to first order. In contrast, the stochastic part $h(v, w)$ is nonzero to zeroth order, so we need only expand that to zeroth order. That gets us
+    \begin{equation}
+        \qvec{v}{w}' \approx \mathbf{M} \qvec{v}{w} dt + \qvec{0}{\frac{0.1003}{\sqrt{N_K}} dB_t}
+    \end{equation}
+    Here we used the value of (\ref{eqn:h-eq}) for the stochastic part. Meanwhile, $\mathbf{M}$ is the Jacobian matrix of the dynamic part in (\ref{eqn:ml-stochastic}):
+    \begin{equation}
+        \mathbf{M} = D\qvec{f(v, w)}{g(v, w)}
+    \end{equation}
+
+    % X~ transformation
+    The linear approximation is valid in a small region near the fixed point. Of course, this region is necessarily within the unstable limit cycle. Numerical experiemnts can provide more clarity into the size of this region. Such a region would be elliptical, however. This is because the coordinates $v, w$ are not symmetrical in the sense that $\mathbf{M}$ does not stretch and shear them uniformly. To remove this complication and simplify the equation, we can define the matrix
+    \begin{equation}
+        \mathbf{Q} = \qmat{\omega}{m_{11} + \lambda}{0}{m_{21}}
+    \end{equation}
+    Then we define
+    \begin{align}
+        \mathbf{A} &= \mathbf{Q}^{-1}\mathbf{M}\mathbf{Q} = \qmat{-\lambda}{\omega}{-\omega}{-\lambda} \\
+        \tilde{\mathbf{x}} &= \mathbf{Q}^{-1}\qvec{v}{w} \\
+        \mathbf{c} &= \mathbf{Q}^{-1} \qvec{0}{\frac{0.1003}{\sqrt{N_K}} dB_t}
+    \end{align}
+    We then obtain the symmetrized equation
+    \begin{equation}
+        d\tilde{\mathbf{x}} = \mathbf{A}\tilde{\mathbf{x}} + \mathbf{c}
+    \end{equation}
+    In the transformed space $\tilde{\mathbf{x}}$, it makes sense to talk about circular regions as opposed to elliptical regions in the original coordinate system. Finally, we can further simplify this equation by factoring out rotations. If we define
+    \begin{equation}
+        \tilde{\tilde{\mathbf{x}}} = R_{\omega t} \tilde{\mathbf{x}} = \qmat{\cos\omega t}{-\sin\omega t}{\sin\omega t}{\cos\omega t} \tilde{\mathbf{x}}
+    \end{equation}
+    Then we obtain the equation
+    \begin{equation}
+        d\tilde{\tilde{\mathbf{x}}} = -\lambda\tilde{\tilde{\mathbf{x}}} + R_{\omega t}\mathbf{c}
+    \end{equation}
 
     \subsection{Numerical Comparison}
+    % TODO
 
     \subsection{Helpful Resources}
-
-    \section{Poincare-Like Maps} % TODO change name?
     % TODO
 
     \section{Patched Model}
