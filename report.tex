@@ -48,6 +48,33 @@
 %% This package allows us to make nice ordered lists with numbers, letters or roman numerals
 
 \usepackage{titlesec}
+\usepackage{hyperref}
+
+\usepackage{xcolor}
+\definecolor{lblue}{HTML}{D8FFFF}
+
+\usepackage{listings}
+\lstset{
+    language=Python,
+    frame=trbl,
+    frameround=tttt,
+    backgroundcolor=\color{lblue},
+    rulecolor=\color{black},
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle={\small\ttfamily},
+    numbers=none,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color{dkgreen},
+    stringstyle=\color{mauve},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=4
+}
+\thicklines
 
 \usepackage[hang,flushmargin]{footmisc}
 
@@ -124,16 +151,139 @@
 
     \subsection{Context}
 
+    % Project context
+    This four-month USRA project was undertaken with the supervision of Professor Wayne Nagata and Professor Priscilla Greenwood. Here we investigated the stochastic Morris-Lecar neuron, comparing different models and measuring statistics such as interspike interval distributions and exit times.
+
+    % About the report
+    This report is a summary of the work the author has done, and serves as a companion to the codebase developed for this project. There are two types of readers this report targets: knowledgable researchers (such as Professor Priscilla and Professor Nagata) who can find results and code annotations handy in this report, and new students who would additionally benefit from the discussions of theory and resource recommendations.
+
     \subsection{Acknowledgements}
 
     \subsection{Contact Me}
-    % TODO
+    I can be reached out to by email (as of the time of this writing) at \href{mailto:jwu277@gmail.com}{jwu277@gmail.com}.
 
     \section{Code Usage}
 
+    The code developed for this project can be found (as of the time of this writing) at \url{https://github.com/jwu277/usra2021}. The software is written in Python 3.
+
     \subsection{Code Structure}
 
+    % High-level description
+    The project repoository is divided into three directories:
+    \begin{enumerate}
+        \item \texttt{neurons:} these files contain classes that are numerical implementations of various neuron models.
+        \item \texttt{scripts:} these files contain runnable scripts that perform various simulations.
+        \item \texttt{util:} these files contain various useful functions that files in the \texttt{neurons} and \texttt{scripts} directories may use.
+    \end{enumerate}
+
+    % Description of each file
+    A description of the files in the repository is given in \reftab{tab:code-files}.
+    \begin{table}
+    
+        \centering
+    
+        \begin{adjustbox}{max width=\textwidth}
+    
+            \begin{tabular} { | c | c | c | }
+                \hline
+                File & Description & Notes \\
+                \hline\hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+                \texttt{neurons/bm.py} & lorem & ipsum \\
+                \hline
+            \end{tabular}
+    
+        \end{adjustbox}
+    
+        \caption{TODO}
+        
+        \label{tab:code-files}
+    
+    \end{table}
+
     \subsection{Running Scripts}
+    First, a new user will likely need to run
+    \begin{lstlisting}
+        python -m pip install -r requirements.txt
+    \end{lstlisting}
+    in a terminal at the root of the repository. Note: \texttt{python} is taken to be the alias for Python 3. After that, the dependencies should be installed and scripts can now be run. To do so, execute
+    \begin{lstlisting}
+        python -m scripts.<scriptname>
+    \end{lstlisting}
+    in a terminal again at the root of the repository. Here \texttt{<scriptname>} is the name of the script file (excluding the \texttt{.py} suffix) to be run. For example, to run a simulation of interspike intervals for a binary Markov neuron, run
+    \begin{lstlisting}
+        python -m scripts.bm
+    \end{lstlisting}
+    As of the writing of this report, a plot should appear after a bit of computation time (exit the plot to terminate the program).
 
     % TODO
 
@@ -420,7 +570,10 @@
 
     \section{Interspike Intervals}
 
+    One statistic of interest in this project is the interspike interval distribution. Intuitively, these intervals are the lengths of time between successive spikes in the membrane potential. Adding stochastics to the Morris-Lecar neuron results in a probabilistic distribution of intervals.
+
     \subsection{Defining Intervals}
+    % TODO: finish dynamics section
 
     \subsection{Results}
 
