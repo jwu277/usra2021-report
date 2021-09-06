@@ -48,8 +48,6 @@
 %% This package allows us to make nice ordered lists with numbers, letters or roman numerals
 
 \usepackage{titlesec}
-\titlespacing*{\subsection}{0pt}{0pt}{3.0ex}
-\titlespacing*{\subsubsection}{0pt}{3.0ex}{0.5ex}
 
 \usepackage[hang,flushmargin]{footmisc}
 
@@ -92,11 +90,16 @@
 \newcommand*{\Arg}[1]{\text{Arg}\left(#1\right)}
 \newcommand*{\Log}[1]{\text{Log}\left(#1\right)}
 \newcommand*{\Tr}[1]{\text{Tr}\left(#1\right)}
+\newcommand*{\Binom}[2]{\text{Binom}\left(#1, #2\right)}
 
 \newcommand*{\ket}[1]{\left|#1\right>}
 \newcommand*{\bra}[1]{\left<#1\right|}
 \newcommand*{\braket}[2]{\left<#1\right|\left.\!#2\right>}
 \newcommand*{\comm}[2]{\left[#1, #2\right]}
+
+% Quick 2-vector and 2x2 matrix
+\newcommand*{\qvec}[2]{\begin{pmatrix} #1 \\ #2 \end{pmatrix}}
+\newcommand*{\qmat}[4]{\begin{pmatrix} #1 & #2 \\ #3 & #4 \end{pmatrix}}
 
 % LaTeX
 \newcommand{\fig}[2]{\includegraphics[width=#1\textwidth]{img/#2}}
@@ -124,6 +127,8 @@
     % TODO
 
     \section{Morris-Lecar Neuron}
+
+    This project investigated the Morris-Lecar model of a neuron. This section goes over background theory on the model.
     
     \subsection{Circuit Model}
 
@@ -167,6 +172,7 @@
     % ML voltage gating vars simplification
     However, the $m$ timescale is much shorter than the $w$ timescale, so that $m \approx m_\infty(v)$ in (\ref{eqn:ml-circuit}). Furthermore, to be consistent with \cite{snm}, we may re-arrange the $x = w$ version of (\ref{eqn:ml-voltage-gating}) to be of the following form:
     \begin{equation}
+        \label{eqn:w-dyn}
         \deriv{w}{t} = \alpha(v)(1  - w) - \beta(v)w
     \end{equation}
     where
@@ -227,19 +233,198 @@
     
     \end{table}
 
+    \subsection{Helpful Resources}
+    TODO
+
     \section{Dynamics}
+
+    \subsection{Bautin Bifurcation}
+
+    % "Canonical" equation
+    Consider a 2-dimensional dynamical system $(x(t), y(t)) \in \mathbb{R}^2$. We may equivalently define the complex variable $z = x + iy \in \mathbb{C}$. Alternatively, we may express this system in polar coordinates: $z = re^{i\varphi}$. Now, let us consider the system
+    \begin{align}
+        \deriv{z}{t} &= \lambda z\left(1 + k_1\abs{z}^2 + k_2\abs{z}^4 + O\left(\abs{z}^5\right)\right) \\
+        \label{eqn:bautin-canon}
+        &= \lambda z + c_1 z\abs{z}^2 + c_2 z\abs{z}^4 + O\left(\abs{z}^6\right)
+    \end{align}
+    Here $c_j = \lambda k_j$, and $\lambda, c_j \in \mathbb{C}$ for $j = 1, 2$. Let us rewrite $\lambda = \alpha + i\omega, c_j = l_j + im_j$, where $\alpha, \omega, l_j, m_j \in \mathbb{R}$. Then taking real and imaginary parts of (\ref{eqn:bautin-canon}) gets us
+    \begin{align}
+        \deriv{x}{t} &= (\alpha + l_1 r^2 + l_2 r^4)x - (\omega + m_1 r^2 + m_2 r^4)y \\
+        \deriv{y}{t} &= (\omega + m_1 r^2 + m_2 r^4)x + (\alpha + l_1 r^2 + l_2 r^4)y
+    \end{align}
+    Here we dropped terms of order $O\left(\abs{z}^6\right)$ or higher. We do so by assuming that $l_2 < 0$ (and is thus nonzero). The parameter $l_2$, known as the \textit{second Lyapunov coefficient}, is indeed negative for the Morris-Lecar neuron (as we shall discuss later). Doing some calculus, the equations for $r$ and $\varphi$ become:
+    \begin{align}
+        \deriv{r}{t} &= r(\alpha + l_1 r^2 + l_2 r^4) \\
+        \deriv{\varphi}{t} &= \omega + m_1 r^2 + m_2 r^4
+    \end{align}
+
+    % Fixed points + limit cycles
+    We see that there is a fixed point at $r = 0$. Furthermore, there are circular limit cycles at $r^2$ satisfying the quadratic
+    \begin{equation}
+        \label{eqn:bautin-quad}
+        f(r^2) = r^4 + \frac{l_1}{l_2} r^2 + \frac{\alpha}{l_2} = 0
+    \end{equation}
+    Since these limit cycles occur at $r > 0$, we have precisely one limit cycle for each $r^2$ root. The discriminant $\Delta$ of the quadratic (\ref{eqn:bautin-quad}) is
+    \begin{equation}
+        \Delta = \left(\frac{l_1}{l_2}\right)^2 - 4\frac{\alpha}{l_2} = \frac{1}{l_2^2} \left(l_1^2 - 4\alpha l_2\right)
+    \end{equation}
+    The sign of $\Delta$ is therefore just the sign of $l_1^2 - 4\alpha l_2$. Then a necessary condition for there to be limit cycles i.e. positive real roots for $r^2$ is:
+    \begin{equation}
+        \alpha \geq \frac{l_1^2}{4l_2}
+    \end{equation}
+
+    % Delta >= 0
+    Now assuming that $\Delta \geq 0$ i.e. the roots for $r^2$ are all real, we use Vieta's formulas to note that the sum and product of the roots are $-\frac{l_1}{l_2}, \frac{\alpha}{l_2}$, repsectively.
+    
+    % alpha > 0
+    For $\Delta \geq 0$, exactly one positive root exists precisely when $\alpha > 0 \therefore \frac{\alpha}{l_2} < 0$. But we immediately have $\alpha > 0 \geq \frac{l_1}{4l_2}$, satisfying the discriminant condition.
+
+    % alpha = 0
+    Now if $\alpha = 0$, then at least one root must coincide with $r = 0$. The other root is thus equal to $-\frac{l_1}{l_2}$ and is positive iff $l_1 > 0$.
+
+    % alpha < 0
+    Next, if $\alpha < 0$, both roots have the same sign. If $l_1 \leq 0$ then the sum of the roots is nonpositive, resulting in both roots being nonpositive. Thus there are no limit cycles for $\alpha < 0, l_1 \leq 0$. However, if $\alpha < 0$ and $l_1 > 0$, there are two positive roots for $r^2$ if $\alpha > \frac{l_1^2}{4l_2}$. If instead, $l_1 > 0$ and $\alpha = \frac{l_1^2}{4l_2} < 0$ then there is a repeated positive root and therefore one limit cycle.
+
+    % Stability
+    Finally, the stability of the limit cycles and $r = 0$ fixed point is determined by the sign of $f(r^2)$ in between these roots. Since $l_2 < 0$, the outermost limit cycle (or fixed point if none exists) attracts from $r = \infty$. Meanwhile, the stability of the fixed point is determined by the sign of $\alpha$ (or $l_1$ if $\alpha = 0$, or $l_2 < 0$ if $\alpha, l_1 = 0$). Finally, if there are two limit cycles, the inner one is unstable while the outer one is stable since $f(r^2)$ is a downwards parabola in $r^2$.
+
+    % Bifurcation diagram
+    Put all together, the bifurcation diagram is given in \reffig{fig:bautin}
+    \begin{figure}
+
+        \centering
+    
+        \centerfig{0.65}{bautin.jpg}
+        \caption{TODO + cite Kunetzsov}
+    
+        \label{fig:bautin}
+    
+    \end{figure}
+
+    % Hopf bifurcation
+    The curve $H_- = \{\alpha = 0, l_1 < 0\}$, in \reffig{fig:bautin} is a \textit{Hopf bifurcation}. For a fixed $l_1 < 0$, varying $\alpha$ near zero affects the stability of the system; $\alpha < 0$ has a limit cycle whereas $\alpha > 0$ does not. Similarly, $H_+ = \{\alpha = 0, l_1 > 0\}$ is also a Hopf bifurcation. This time, a limit cycle is produced at the fixed point when varying $\alpha > 0$ to $\alpha < 0$. In general, the Hopf bifurcation is a local codim-1 bifurcation, where a limit cycle appears from/disappears into a fixed point.
+
+    % SNLC bifurcation
+    The curve $T = \{l_1 > 0, \alpha = \frac{l_1^2}{4l_2}\}$ is a \textit{saddle node of limit cycles (SNLC) bifurcation}. Here the two limit cycles in region 3 collapse into a single limit cycle on $T$. Varying a parameter more (e.g. decreasing $\alpha$ or $l_1$) will cause the semi-stable limit cycle to disappear. Like the Hopf bifurcation, the SNLC bifurcation is a local codim-1 bifurcation.
+
+    % Bautin bifurcation
+    Finally, a \textit{Bautin bifurcation} occurs near the point $\alpha, l_1 = 0$ in this model system. Since two parameters are varied in this bifurcation ($\alpha, l_1$), this is a local codim-2 bifurcation.
+
+    \subsection{Morris-Lecar Dynamics}
+
+    \subsection{Scaling Results}
+
+    \subsection{Helpful Resources}
 
     \section{Stochastics}
 
+    \subsection{It\^o Calculus}
+
+    % Wiener process TODO: cite finbook
+    $X_t$ is a \textit{Wiener process} iff it is a continuous-time stochastic process satisfying the following conditions:
+    \begin{enumerate}
+        \item \textbf{Stationary increments:} If $s \leq t$, $X_t - X_s$ has the same distribution as $X_{t-s} - X_0$.
+        \item \textbf{Independent increments:} If $s \leq t$, $X_t - X_s$ is independent of $X_r$ for all $r \leq s$.
+        \item \textbf{Continuous paths:} $X_t$ is a continuous function of $t$.
+    \end{enumerate}
+
+    Here, a Wiener process is characterized by three paramters: the initial condition $X_0$, the drift $m$, and the variance parameter $\sigma^2$. For $s \leq t$, the increment $X_t - X_s$ is distributed as a Gaussian with mean $m(t - s)$ and variance $\sigma^2(t-s)$:
+    \begin{equation}
+        X_t - X_s \sim N\left(m(t - s), \sigma^2 (t - s)\right)
+    \end{equation}
+    The \textit{standard} Wiener process $B_t$ has $B_0 = 0$, $m = 0$, and $\sigma^2 = 1$. We may therefore write
+    \begin{equation}
+        dX_t = m dt + \sigma dB_t
+    \end{equation}
+    Note that $dB_t$ is distributed as
+    \begin{equation}
+        dB_t \sim \sqrt{dt}Z
+    \end{equation}
+    where $Z$ is a standard normal random variable. Now in general, if $f$ is a function of $X_t$, then we may write
+    \begin{equation}
+        df(X_t) = g(X_t) dt + h(X_t) dB_t
+    \end{equation}
+    for some functions $g(X_t), h(X_t)$ (It\^o's lemma gives a more precise result, but we will not utilize it for these purposes).
+
+    The $n$-dimensional standard Wiener process $\mathbf{B_t}$ is simply a vector of $n$ independent standard Wiener processes. Then an $n$-dimensional dyanmical system $\mathbf{X}$ can be expressed in the form
+    \begin{equation}
+        \label{eqn:sde-general}
+        d\mathbf{X} = \mathbf{g}(\mathbf{X}) dt + \mathbf{H}(\mathbf{X}) \mathbf{dB_t}
+    \end{equation}
+    Here $\mathbf{g}$ is a vector while $\mathbf{H}$ is a matrix.
+
+    \subsection{Stochastic Morris-Lecar}
+
+    % Stochastic model
+    We can model the neuron as having $N_K$ potassium channels (in this project, we are typically on the order of $N_K \sim 1000$), each of which can be fully open or closed. The opening rate (i.e. probability rate of transition from the closed state to the open state) and closing rate for each channel would be $\alpha(v)$ and $\beta(v)$ from (\ref{eqn:w-dyn}), respectively. Then over a small time increment $dt$, the probability of a closed channel opening is $\alpha(v) dt$. Likewise, the probability of an open channel closing is $\beta(v) dt$.
+
+    % Apply CLT
+    Over a time increment of $dt$, we have
+    \begin{equation}
+        \label{eqn:w-stochastic-bare}
+        dw = w(t + dt) - w(t) \sim \frac{\Binom{N_K (1 - w)}{\alpha dt} - \Binom{N_K w}{\beta dt}}{N_K}
+    \end{equation}
+    Note that $\Binom{n, p} = \sum_{j = 1}^n I_j$, where each $I_j$ is an independent indicator random variable with probability $p$. By the central limit theorem, when $n$ is large
+    \begin{equation}
+        \Binom{n}{p} \sim np + \sqrt{np(1-p)} Z
+    \end{equation}
+    where $Z$ is a standard normal random variable. Then (\ref{eqn:w-stochastic-bare}) becomes
+    \small
+    \begin{equation}
+        dw \sim \frac{\left(N_K (1 - w) \alpha dt + \sqrt{N_K(1 - w) \alpha dt (1 - \alpha dt)}Z_1\right) - \left(N_K w \beta dt + \sqrt{N_K w \beta dt (1 - \beta dt)}Z_2\right)}{N_K}
+    \end{equation}
+    \normalsize
+    Here $Z_1$ and $Z_2$ are independent normal random variables. This is because the closed and open channels are independent (as we assumed all the channels to be independent). Since $dt$ is small, $1 - \alpha dt \approx 1$. So
+    \begin{equation}
+        dw \sim \left(\alpha (1 - w) - \beta w\right) dt + \frac{1}{\sqrt{N_K}}\sqrt{\alpha (1 - w) + \beta w}\sqrt{dt}Z
+    \end{equation}
+    As a system of stochastic differential equations, we have
+    \begin{align}
+        \qvec{v}{w}' &= \qvec{f(v, w)}{g(v, w)} dt + \qmat{0}{0}{0}{h(v, w)} \mathbf{dB_t} \\
+        f(v, w) &= \frac{I - \bar{g}_K w (v - V_K) - \bar{g}_{Ca} m_\infty(v) (v - V_{Ca}) - g_L (v - V_L)}{C} \\
+        g(v, w) &= \alpha(v) (1 - w) - \beta(v) w \\
+        h(v, w) &= \frac{1}{\sqrt{N_K}}\sqrt{\alpha(v) (1 - w) + \beta(v) w}
+    \end{align}
+
+    \subsection{Euler-Maruyama}
+
+    % General description
+    The Euler-Maruyama method is a generalization of the Euler method to stochastic differential equations of the form (\ref{eqn:sde-general}). Here, a small finite time increment $dt$ is chosen. Then, starting from an initial condition $\mathbf{X}(0)$, we iteratively compute
+    \begin{equation}
+        \mathbf{X}(t + dt) = \mathbf{X}(t) + \mathbf{g}(\mathbf{X}) dt + \mathbf{H}(\mathbf{X}) \mathbf{Z} \sqrt{dt}
+    \end{equation}
+    Here $\mathbf{Z}$ is a randomly generated vector, where each entry is obtained from an independent unit normal distribution. The resulting path $\mathbf{X}(t)$ will be distributed approximately as the true distribution; thus, many trials of the Euler-Maruyama method can be used to obtain statistics for the process (e.g. interspike intervals, which will be discussed later).
+
+    % ML-specific
+    To ease computations, only the second entry of $\mathbf{Z}$ needs to be generated for the 2-dimensional stochastic Morris-Lecar model (since only $\mathbf{H_{22}}$ is nonzero). Furthermore, the random numbers can all be generated at the start rather than at every iteration.
+
+    \subsection{Helpful Resources}
+    % TODO
+
     \section{Interspike Intervals}
 
-    \section{Linearized Model}
+    \subsection{Defining Intervals}
 
-    \section{Poincare-Like Maps}
+    \subsection{Results}
+
+    \section{Alternative Dynamics}
+
+    \subsection{Jacobi Dynamics}
+
+    \subsection{Linearized Dynamics}
+
+    \subsection{Numerical Comparison}
+
+    \subsection{Helpful Resources}
+
+    \section{Poincare-Like Maps} % TODO change name?
+    % TODO
 
     \section{Patched Model}
+    % TODO
 
     \section{Next Steps}
+    % TODO
 
     \pagebreak
 
