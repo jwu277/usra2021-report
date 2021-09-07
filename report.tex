@@ -49,6 +49,10 @@
 
 \usepackage{titlesec}
 \usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{ltablex}
+\usepackage{caption}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
 
 \usepackage{xcolor}
 \definecolor{lblue}{HTML}{D8FFFF}
@@ -152,15 +156,23 @@
     \subsection{Context}
 
     % Project context
-    This four-month USRA project was undertaken with the supervision of Professor Wayne Nagata and Professor Priscilla Greenwood. Here we investigated the stochastic Morris-Lecar neuron, comparing different models and measuring statistics such as interspike interval distributions and exit times.
+    This four-month USRA project was undertaken with the supervision of Professor Wayne Nagata and Professor Priscilla Greenwood. Here we investigated the stochastic Morris-Lecar neuron, comparing different models and measuring statistics such as interspike interval (ISI) distributions and exit times.
 
     % About the report
     This report is a summary of the work the author has done, and serves as a companion to the codebase developed for this project. There are two types of readers this report targets: knowledgable researchers (such as Professor Priscilla and Professor Nagata) who can find results and code annotations handy in this report, and new students who would additionally benefit from the discussions of theory and resource recommendations.
 
     \subsection{Acknowledgements}
 
+    % Thank supervisors
+    I express my gratitude towards Professor Nagata and Professor Greenwood for introducing me to mathematical neuroscience, as well as engaging me more into nonlinear dynamics and stochastics. I have learned a lot from Professor Greenwood and Professor Nagata, and I thank them for supervising me.
+
+    % Thank NSERC
+    I also thank the Natural Sciences and Engineering Research Council of Canada for helping fund this project with a USRA.
+
     \subsection{Contact Me}
     I can be reached out to by email (as of the time of this writing) at \href{mailto:jwu277@gmail.com}{jwu277@gmail.com}.
+
+    \pagebreak
 
     \section{Code Usage}
 
@@ -176,99 +188,102 @@
         \item \texttt{util:} these files contain various useful functions that files in the \texttt{neurons} and \texttt{scripts} directories may use.
     \end{enumerate}
 
+    % Conventions to be aware of
+    Functions and variables starting with an underscore (e.g. \texttt{\_a}) are intended to be used as private entities (i.e. only used within the file). Another thing is that each \texttt{neuron} file except for \texttt{neuron.mlr} has a corresponding \texttt{scripts} file with the same name that can be run for a quick simulation of the neuron. This mapping is not surjective, however. Now, some scripts will have a line similar to
+    \begin{lstlisting}
+        THREADS = 12
+    \end{lstlisting}
+    Feel free to change the number to the appropriate number of threads in your machine. Finally, scripts will sometimes have parameters such as \texttt{tmax}, \texttt{trials}, etc. As with most variables in the scripts, these can be changed to suit your needs.
+
     % Description of each file
-    A description of the files in the repository is given in \reftab{tab:code-files}.
-    \begin{table}
+    A description of the files in the repository is given in \reftab{tab:code-files}. Of course, the code files themselves contain more detailed annotations.
     
-        \centering
+    \begin{center}
     
-        \begin{adjustbox}{max width=\textwidth}
+        \begin{tabularx}{\linewidth}{ | c | Y | X | }
+            
+            \hline
+            File & Description & \multicolumn{1}{c|}{Notes} \\
+            \hline\hline
+            \texttt{neurons/bm.py} & Binary Markov (i.e. 2-state) neuron & \\
+            \hline
+            \texttt{neurons/izhikevich.py} & Izhikevich neuron & \\
+            \hline
+            \texttt{neurons/lif.py} & Linear integrate and fire neuron & \\
+            \hline
+            \texttt{neurons/ml.py} & Morris-Lecar neuron & \\
+            \hline
+            \texttt{neurons/mlj.py} & Jacobi Morris-Lecar neuron & Needs to be initialized with \texttt{init} before usage \\
+            \hline
+            \texttt{neurons/mll.py} & Linear Morris-Lecar neuron ($\tilde{\tilde{\mathbf{x}}}$) & Needs to be initialized with \texttt{init} before usage \\
+            \hline
+            \texttt{neurons/mlr.py} & Linear Distance Morris-Lecar neuron & Not really used. Simulates the modulus of the linear Morris-Lecar neuron. \\
+            \hline
+            \texttt{neurons/modelb.py} & ``Model B'' neuron; related to the patched model. & Patched model still needs to be investigated further, so work can still be done here. \\
+            \hline
+            \texttt{scripts/bm.py} &  ISI distribution simulation for the binary Markov neuron & \\
+            \hline
+            \texttt{scripts/contour.py} & TODO & ipsum \\
+            \hline
+            \texttt{scripts/det.py} & Compares deterministic trajectories of different neuron models & \\
+            \hline
+            \texttt{scripts/docheck.py} & TODO & ipsum \\
+            \hline
+            \texttt{scripts/dtstab.py} & Compares different values of $dt$ and numerical methods(currently Euler and RK45) & $dt = 0.1$ suffices. Also, no appreciable difference was observed between the Euler and RK45 methods. \\
+            \hline
+            \texttt{scripts/elstats.py} & TODO & ipsum \\
+            \hline
+            \texttt{scripts/isih.py} & TODO & ipsum \\
+            \hline
+            \texttt{scripts/izhikevich.py} & ISI distribution simulation for the Izhikevich neuron withPoisson current & Not really used and might have inconsistent units \\
+            \hline
+            \texttt{scripts/lif.py} & ISI distribution simulation for the LIF neuron & \\
+            \hline
+            \texttt{scripts/longtin.py} & Simulation of Longtin's stochastic bistable system & Simulation does not reproduce Longtin's results \\
+            \hline
+            \texttt{scripts/ml.py} & Simulation of a single trajectory of the Morris-Lecar neuron & \\
+            \hline
+            \texttt{scripts/mlj.py} & Simulation of a single trajectory of the Jacobi Morris-Lecar neuron & \\
+            \hline
+            \texttt{scripts/mll.py} & Simulation of a single trajectory of the linear Morris-Lecar neuron & \\
+            \hline
+            \texttt{scripts/mlrtrials.py} & TODO & ipsum \\
+            \hline
+            \texttt{scripts/modelb.py} & Simulation of a single trajectory of the Model B neuron & \\
+            \hline
+            \texttt{scripts/pdist.py} & TODO & ipsum \\
+            \hline
+            \texttt{scripts/phi\_noise.py} & Saves a run of Morris-Lecar neuron for certain values of$\phi$ and $N_K$ & Filename for save should be renamed as desired \\
+            \hline
+            \texttt{scripts/plotter.py} & Makes an animated plot of a phase portrait trajectory & Requires ImageMagick to be installed \\
+            \hline
+            \texttt{scripts/poincare.py} & TODO & ipsum \\
+            \hline
+            \texttt{scripts/sandbox.py} & Sandbox to play around in & \\
+            \hline
+            \texttt{util/current.py} & Generates $I(t)$ signal & \\
+            \hline
+            \texttt{util/dyn.py} & Used to find fixed point of a system & \\
+            \hline
+            \texttt{util/integrate.py} & Essentially a wrapper for \texttt{scipy.integrate.solve\_ivp
+            } & \\
+            \hline
+            \texttt{util/isi.py} & Computes spike times and ISIs in a signal & \\
+            \hline
+            \texttt{util/ito.py} & Euler-Maruyama method implementation & \\
+            \hline
+            \texttt{util/ml.py} & TODO & ipsum \\
+            \hline
+            \texttt{util/plot.py} & Handy plotting functions & \\
+            \hline
+
+            \captionsetup{width=\linewidth}
+            \caption{Descriptions of all the code files in the project repository.}
+            \label{tab:code-files}
+
+        \end{tabularx}
     
-            \begin{tabular} { | c | c | c | }
-                \hline
-                File & Description & Notes \\
-                \hline\hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-                \texttt{neurons/bm.py} & lorem & ipsum \\
-                \hline
-            \end{tabular}
-    
-        \end{adjustbox}
-    
-        \caption{TODO}
-        
-        \label{tab:code-files}
-    
-    \end{table}
+    \end{center}
 
     \subsection{Running Scripts}
     First, a new user will likely need to run
@@ -279,13 +294,13 @@
     \begin{lstlisting}
         python -m scripts.<scriptname>
     \end{lstlisting}
-    in a terminal again at the root of the repository. Here \texttt{<scriptname>} is the name of the script file (excluding the \texttt{.py} suffix) to be run. For example, to run a simulation of interspike intervals for a binary Markov neuron, run
+    in a terminal again at the root of the repository. Here \texttt{<scriptname>} is the name of the script file (excluding the \texttt{.py} suffix) to be run. For example, to run a simulation of ISIs for a binary Markov neuron, run
     \begin{lstlisting}
         python -m scripts.bm
     \end{lstlisting}
     As of the writing of this report, a plot should appear after a bit of computation time (exit the plot to terminate the program).
 
-    % TODO
+    \pagebreak
 
     \section{Morris-Lecar Neuron}
 
@@ -560,7 +575,7 @@
     \begin{equation}
         \mathbf{X}(t + dt) = \mathbf{X}(t) + \mathbf{g}(\mathbf{X}) dt + \mathbf{H}(\mathbf{X}) \mathbf{Z} \sqrt{dt}
     \end{equation}
-    Here $\mathbf{Z}$ is a randomly generated vector, where each entry is obtained from an independent unit normal distribution. The resulting path $\mathbf{X}(t)$ will be distributed approximately as the true distribution; thus, many trials of the Euler-Maruyama method can be used to obtain statistics for the process (e.g. interspike intervals, which will be discussed later).
+    Here $\mathbf{Z}$ is a randomly generated vector, where each entry is obtained from an independent unit normal distribution. The resulting path $\mathbf{X}(t)$ will be distributed approximately as the true distribution; thus, many trials of the Euler-Maruyama method can be used to obtain statistics for the process (e.g. ISIs, which will be discussed later).
 
     % ML-specific
     To ease computations, only the second entry of $\mathbf{Z}$ needs to be generated for the 2-dimensional stochastic Morris-Lecar model (since only $\mathbf{H_{22}}$ is nonzero). Furthermore, the random numbers can all be generated at the start rather than at every iteration.
@@ -570,7 +585,7 @@
 
     \section{Interspike Intervals}
 
-    One statistic of interest in this project is the interspike interval distribution. Intuitively, these intervals are the lengths of time between successive spikes in the membrane potential. Adding stochastics to the Morris-Lecar neuron results in a probabilistic distribution of intervals.
+    One statistic of interest in this project is the ISI distribution. Intuitively, these intervals are the lengths of time between successive spikes in the membrane potential. Adding stochastics to the Morris-Lecar neuron results in a probabilistic distribution of intervals.
 
     \subsection{Defining Intervals}
     % TODO: finish dynamics section
