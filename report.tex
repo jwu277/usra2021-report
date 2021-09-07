@@ -51,7 +51,9 @@
 \usepackage{hyperref}
 \usepackage{tabularx}
 \usepackage{ltablex}
-\usepackage{caption}
+\usepackage[justification=centering]{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
 
 \usepackage{xcolor}
@@ -143,6 +145,9 @@
 \newcommand{\reffig}[1]{\textbf{Figure \ref{#1}}}
 \newcommand{\reftab}[1]{\textbf{Table \ref{#1}}}
 
+% Header
+\lhead{}
+
 %%
 
 \begin{document}
@@ -201,7 +206,7 @@
     \begin{center}
     
         \begin{tabularx}{\linewidth}{ | c | Y | X | }
-            
+
             \hline
             File & Description & \multicolumn{1}{c|}{Notes} \\
             \hline\hline
@@ -303,8 +308,6 @@
     \pagebreak
 
     \section{Morris-Lecar Neuron}
-
-    This project investigated the Morris-Lecar model of a neuron. This section goes over background theory on the model.
     
     \subsection{Circuit Model}
 
@@ -312,13 +315,13 @@
     The Morris-Lecar description \cite{ml} models a neuron as having a membrane potential $v$, defined to be the difference in voltage between the inside and outside of the neuron cell. Current flows through potassium and calcium channels in the membrane, labelled as $I_K$ and $I_{Ca}$, respectively. There is also some current arising form other ions, which is collectively totalled as the leak current $I_L$. The combined potassium, calcium, and leak channels each have an effective conductance (or, taking reciprocals, resistance) and potential. Finally, the membrane has a capacitance $C$. \reffig{fig:ml-circuit} depicts a circuit for this model.
 
     % ML neuron circuit
-    \begin{figure}
+    \begin{figure}[h]
 
         \centering
     
         \centerfig{0.6}{ml-circuit.jpg}
-        \caption{TODO + cite ML}
-    
+
+        \caption{Equivalent circuit of Morris-Lecar neuron model. Only $g_{Ca}$ and $g_K$ may vary with time--the other parameters in this diagram are constants. Diagram copied from \cite{ml}.}
         \label{fig:ml-circuit}
     
     \end{figure}
@@ -351,29 +354,27 @@
         \label{eqn:w-dyn}
         \deriv{w}{t} = \alpha(v)(1  - w) - \beta(v)w
     \end{equation}
-    where
+    Finally, we have
     \begin{align}
         \label{eqn:alpha-def}
         \alpha(v) &= \frac{1}{2} \phi \cosh{\left(\frac{v - V_3}{2V_4}\right)}\left(1 + \tanh{\left(\frac{v - V_3}{V_4}\right)}\right) \\
         \label{eqn:beta-def}
-        \beta(v) &= \frac{1}{2} \phi \cosh{\left(\frac{v - V_3}{2V_4}\right)}\left(1 - \tanh{\left(\frac{v - V_3}{V_4}\right)}\right)
+        \beta(v) &= \frac{1}{2} \phi \cosh{\left(\frac{v - V_3}{2V_4}\right)}\left(1 - \tanh{\left(\frac{v - V_3}{V_4}\right)}\right) \\
+        m_\infty(v) &= \frac{1}{2}\left(1 + \tanh{\left(\frac{v - V_1}{V_2}\right)}\right)
     \end{align}
-    Furthermore, we have
-    \begin{equation}
-        m_\infty(v) = \frac{1}{2}\left(1 + \tanh{\left(\frac{v - V_1}{V_2}\right)}\right)
-    \end{equation}
 
     \subsection{Morris-Lecar Parameters}
 
     % Parameters table
-    The parameters from \cite{snm} used in this project are given in \reftab{tab:ml-param}. Sometimes $I$ and/or $phi$ are varied to assess the bifurcational behaviuor of the system.
-    \begin{table}
-    
-        \centering
-    
-        \begin{adjustbox}{max width=\textwidth}
-    
-            \begin{tabular} { | c | c | c | }
+    The parameters from \cite{snm} used in this project are given in \reftab{tab:ml-param}. Sometimes $I$ and/or $\phi$ are varied to assess the bifurcational behaviuor of the system.
+
+    \begin{table}[h]
+
+        \begin{subtable}{0.49\linewidth}
+
+            \centering
+
+            \begin{tabular}{ | c | c | c | }
                 \hline
                 Variable & Value & Units \\
                 \hline\hline
@@ -391,6 +392,17 @@
                 \hline
                 $V_K$ & -84 & $mV$ \\
                 \hline
+            \end{tabular}
+
+        \end{subtable}
+        \begin{subtable}{0.49\linewidth}
+
+            \centering
+
+            \begin{tabular}{ | c | c | c | }
+                \hline
+                Variable & Value & Units \\
+                \hline\hline
                 $V_1$ & -1.2 & $mV$ \\
                 \hline
                 $V_2$ & 18.0 & $mV$ \\
@@ -403,18 +415,20 @@
                 \hline
                 $I$ & 90 & $\mu A/cm^2$ \\
                 \hline
+
             \end{tabular}
-    
-        \end{adjustbox}
-    
-        \caption{TODO}
-        
+
+        \end{subtable}
+
+        \caption{Values of parameters used in the Morris-Lecar model. These values are assumed for the remainder of the report unless specified otherwise.}
         \label{tab:ml-param}
-    
+
     \end{table}
 
     \subsection{Helpful Resources}
-    TODO
+    The books \cite{snm} and \cite{ermentrout} provide good introductions to the Morris-Lecar model.
+
+    \pagebreak
 
     \section{Dynamics}
 
@@ -495,6 +509,9 @@
     \subsection{Scaling Results}
 
     \subsection{Helpful Resources}
+    TODO
+
+    \pagebreak
 
     \section{Stochastics}
 
@@ -581,7 +598,9 @@
     To ease computations, only the second entry of $\mathbf{Z}$ needs to be generated for the 2-dimensional stochastic Morris-Lecar model (since only $\mathbf{H_{22}}$ is nonzero). Furthermore, the random numbers can all be generated at the start rather than at every iteration.
 
     \subsection{Helpful Resources}
-    % TODO
+    The book \cite{finbook} provides a great introduction to stochastic calculus.
+
+    \pagebreak
 
     \section{Interspike Intervals}
 
@@ -593,7 +612,9 @@
     \subsection{Results}
 
     \section{Poincare-Like Maps} % TODO change name?
-    % TODO
+    TODO
+
+    \pagebreak
 
     \section{Alternative Dynamics}
 
@@ -694,10 +715,12 @@
     \end{equation}
 
     \subsection{Numerical Comparison}
-    % TODO
+    TODO
 
     \subsection{Helpful Resources}
-    % TODO
+    The article \cite{dg} discusses these alternative models as well.
+
+    \pagebreak
 
     \section{Patched Model}
     % TODO
