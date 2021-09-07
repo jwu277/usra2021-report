@@ -212,7 +212,7 @@
             \hline
             File & Description & \multicolumn{1}{c|}{Notes} \\
             \hline\hline
-            \texttt{neurons/bm.py} & Binary Markov (i.e. 2-state) neuron & \\
+            \texttt{neurons/bm.py} & Binary Markov (BM) neuron & \\
             \hline
             \texttt{neurons/izhikevich.py} & Izhikevich neuron & \\
             \hline
@@ -275,11 +275,11 @@
             \texttt{util/integrate.py} & Essentially a wrapper for \texttt{scipy.integrate.solve\_ivp
             } & \\
             \hline
-            \texttt{util/isi.py} & Computes spike times and ISIs in a signal & \\
+            \texttt{util/isi.py} & Computes spike times and ISIs for neuron signals & Not useful for Morris-Lecar neuron. Used in BM, Izhikevich, and LIF neurons. \\
             \hline
             \texttt{util/ito.py} & Euler-Maruyama method implementation & \\
             \hline
-            \texttt{util/ml.py} & TODO & ipsum \\
+            \texttt{util/ml.py} & Computes ISIs, orbit times, etc. for Morris-Lecar signals & \\
             \hline
             \texttt{util/plot.py} & Handy plotting functions & \\
             \hline
@@ -550,13 +550,15 @@
         % v(t)
         \begin{subfigure}{\textwidth}
             \centerfig{0.7}{qvt.jpg}
-            \caption{}
+            \ccaption{$v(t)$ signal}
+            \label{fig:q-plots-vt}
         \end{subfigure}
 
         % Phase portrait
         \begin{subfigure}{\textwidth}
             \centerfig{0.7}{qpp.jpg}
-            \caption{}
+            \caption{Phase portrait}
+            \label{fig:q-plots-pp}
         \end{subfigure}
     
         \captionsetup{width=0.9\linewidth}
@@ -572,13 +574,15 @@
         % v(t)
         \begin{subfigure}{\textwidth}
             \centerfig{0.7}{svt.jpg}
-            \caption{}
+            \caption{$v(t)$ signal}
+            \label{fig:s-plots-vt}
         \end{subfigure}
 
         % Phase portrait
         \begin{subfigure}{\textwidth}
             \centerfig{0.7}{spp.jpg}
-            \caption{}
+            \caption{Phase portrait}
+            \label{fig:s-plots-pp}
         \end{subfigure}
     
         \captionsetup{width=0.9\linewidth}
@@ -635,13 +639,13 @@
     % Bifurcation curve fitting
     The scaling between $I$ and $\phi$ along the $H_+$ and SNLC curves for small $\phi$ was also investigated. Along the $H_+$ curve we have:
     \begin{equation}
-        I \sim \phi
+        I - I_0 \sim \phi
     \end{equation}
     Along the SNLC curve we get:
     \begin{equation}
-        I \sim \phi^{4/3}
+        I - I_0 \sim \phi^{4/3}
     \end{equation}
-    These fits are compared to numerical data in \reffig{fig:bif-scale}.
+    Here $I_0 = 83.6$ is the value of $I$ in the $\phi \to 0^+$ limit (the $H_+$ and SNLC curves appear to approach the same point). These fits are compared to numerical data in \reffig{fig:bif-scale}.
     \begin{figure}[!h]
 
         \centering
@@ -649,7 +653,7 @@
         \centerfig{0.8}{bif-scale.jpg}
     
         \captionsetup{width=0.8\linewidth}
-        \ccaption{Comparison of fit power law scaling and actual numerical data for $I(\phi)$ at small $\phi$ along the $H_+$ and SNLC bifurcation curves. The fits obey the relationships $I = 300 \: \phi$ and $I = 333.3 \: \phi^{4/3}$ along the $H_+$ and SNL curves, respectively.}
+        \ccaption{Comparison of fit power law scaling and actual numerical data for $I(\phi)$ at small $\phi$ along the $H_+$ and SNLC bifurcation curves. The fits obey the relationships $I = 83.6 + 300 \: \phi$ and $I = 83.6 + 333.3 \: \phi^{4/3}$ along the $H_+$ and SNL curves, respectively.}
         \label{fig:bif-scale}
     
     \end{figure}
@@ -740,13 +744,15 @@
         % v(t)
         \begin{subfigure}{\textwidth}
             \centerfig{0.7}{sqvt.jpg}
-            \caption{}
+            \caption{$v(t)$ signal}
+            \label{fig:sq-plots-vt}
         \end{subfigure}
 
         % Phase portrait
         \begin{subfigure}{\textwidth}
             \centerfig{0.7}{sqpp.jpg}
-            \caption{}
+            \caption{Phase portrait}
+            \label{fig:sq-plots-pp}
         \end{subfigure}
     
         \captionsetup{width=0.85\linewidth}
@@ -762,17 +768,19 @@
         % v(t)
         \begin{subfigure}{\textwidth}
             \centerfig{0.7}{ssvt.jpg}
-            \caption{}
+            \caption{$v(t)$ signal}
+            \label{fig:ss-plots-vt}
         \end{subfigure}
 
         % Phase portrait
         \begin{subfigure}{\textwidth}
             \centerfig{0.7}{sspp.jpg}
-            \caption{}
+            \caption{Phase portrait}
+            \label{fig:ss-plots-pp}
         \end{subfigure}
     
         \captionsetup{width=0.8\linewidth}
-        \ccaption{Stochastic spiking trajectory with initial point $(-30.0, 0.1)$ and $t_{max} = 400$.}
+        \ccaption{Stochastic spiking trajectory with initial point $(-30.0, 0.1)$ and $t_{max} = 400$. Parts of this trajectory are quiescent.}
         \label{fig:ss-plots}
     
     \end{figure}
@@ -810,9 +818,73 @@
     One statistic of interest in this project is the ISI distribution. Intuitively, these intervals are the lengths of time between successive spikes in the membrane potential. Adding stochastics to the Morris-Lecar neuron results in a probabilistic distribution of intervals.
 
     \subsection{Defining Intervals}
-    % TODO: finish dynamics section
+
+    % How spike times are defined
+    Defining interspike intervals boils down to defining spike times for a signal. Looking at the $v(t)$ signal in \reffig{fig:s-plots-vt}, we see that these ought to be the distinct local maxima in the $v(t)$ signal. However, not all $v(t)$ maxima qualify as spikes. For example, the quiescent signal in \reffig{fig:q-plots-vt} exhibits maxima, yet should not count as having any spikes. To complicate matters further, the noisy signals in \reffig{fig:sq-plots-vt} and \reffig{fig:ss-plots-vt} have both quiescent and spiking maxima. An easy way of differentiating these two maxima is to introduce a threshold (e.g. 20mV) that a maxima must exceed to constitute a spike.
+
+    % Interspike intervals
+    The ISIs in a signal can then be computed from the differences of these spike times. A given signal will typically have many spike times, giving rise to several ISIs. If we assume the stochastic Morris-Lecar neuron to be ergodic--which it ought to be at least approximately so, considering (granted, I have not proved this, or even gone much beyond \textit{considering} these assertions) that (a) the system can be expanded as an Ornstein–Uhlenbeck process near the fixed point and stable limit cycle, which should be ergodic, and (b) a finite transition probability exists between the two stable states--then running the system for a long time will give us the approximate ISI distribution.
+
+    % Code
+    Spike times and ISIs for a Morris-Lecar signal can be obtained using functions from the \texttt{util/ml.py} file. To reuse software components, the spike times are computed slightly differently than described in this section, however. \textit{Orbit times} (times at which an oscillation begins) are first computed, from which spiking times are determined. The orbit time calculation requires a \texttt{vdiff} parameter that represents at least how much maxima and minima of $v(t)$ should differ by. Meanwhile, the \texttt{sthresh} parameter is simply the spiking voltage threshold.
 
     \subsection{Results}
+
+    % Introduce figures
+    Numerically simulated ISI histograms for the stochastic Morris-Lecar neuron at various values of $N_K$ are given in \reffig{fig:isih}. Recall from (\ref{eqn:ml-stochastic-end}) that the noise amplitude is proportional to $N_K^{-1/2}$. The salient features of these histograms are the discrete peaks followed by the exponential tail.
+
+    \begin{figure}[!h]
+
+        \centering
+
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\linewidth]{img/isih-nk500.jpg}
+        \end{subfigure}
+    
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\linewidth]{img/isih-nk1000.jpg}
+        \end{subfigure}
+        
+        \ccaption{ISI histograms for various values of $N_K$. These histograms were produced by running 3200 trials of the Morris-Lecar neuron for 1000 ms each, with the initial point $(v, w) = (-40.0, 0.42)$.}
+
+    \end{figure}
+    \begin{figure}[!h]\ContinuedFloat
+
+        \centering
+
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\linewidth]{img/isih-nk2000.jpg}
+        \end{subfigure}
+    
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\linewidth]{img/isih-nk2000000.jpg}
+        \end{subfigure}
+
+        \ccaption{ISI histograms for various values of $N_K$. These histograms were produced by running 3200 trials of the Morris-Lecar neuron for 1000ms each, with the initial point $(v, w) = (-40.0, 0.42)$. (cont.)}
+        \label{fig:isih}
+
+    \end{figure}
+
+    % Explain features
+    The discrete peaks and exponential tail can be explained as follows. Between every two consecutive spikes, there is one spiking oscillation and $n \geq 0$ quiescent oscillations. The total time $T$ between two such spikes is then
+    \begin{equation}
+        T = S + \sum_{i=1}^n Q_i
+    \end{equation}
+    where $S$ is the time duration of the spiking oscillation and $Q_i$ is the time duration of the $i$-th quiescent oscillation. As we might expect, $S$ and $Q_i$ are distributed unimodally with expectation values of approximately 100ms and 80ms, respectively. The standard deviations appear to be small compared to the EVs for these times.
+
+    % Addition of RVs
+    Thus the first discrete peak (ordering in terms of increasing ISI) corresponds to $n = 0$. Indeed, this peak is centred at around 100 ms, with the width being attributed to the deviation in $S$. Likewise, the second, third, etc. peaks correspond to $n = 1, 2$, etc. The centres of these peaks would be located at $100 + 80n$ milliseconds, with the width increasing with increasing $n$. This latter assertion arises from how standard deviation increases in quadrature as more independent RVs are added (we intuitively expect $S$ and $Q_i$ to be approximately independent--a claim we scrutinize more closely when we look at Poincare maps).
+
+    % Exponentially decaying peak height
+    We also expect the peak heights to decay exponentially with $n$. This can be seen from the following argument: if we assume quiescent oscillation to be approximately independent of each other, then each quiescent oscillation has a probability $p$ of transitioning to a spiking oscillation. Then $n \geq 1$ should follow a geometric distribution--hence the exponential decay in peak height.
+
+    % Disappearance into tail
+    Now, once $n$ becomes large enough, the successive peaks in the ISI histogram become so wide that they blend in with each other when superposed. The remaining feature of these blended peaks is therefore their heights (i.e. probability density) in the histogram. Per the previous discussion, this results in the exponential tail.
+
+    % Code
+    The numerically obtained ISI histograms agree with those found elsewhere, namely in \cite{rowat}. The results in this report can be reproduced using the \texttt{scripts.isih} script. Some parameters that can be changed in the script include \texttt{Nk}, \texttt{tmax}, and \texttt{epochs}. These correspond to $N_K$, the duration of a single trajectory, and the number of trajectories to simulate, respectively.
+
+    \pagebreak
 
     \section{Poincare-Like Maps} % TODO change name?
     TODO
