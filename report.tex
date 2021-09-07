@@ -58,6 +58,7 @@
 
 \usepackage{xcolor}
 \definecolor{lblue}{HTML}{D8FFFF}
+\definecolor{grellow}{HTML}{AEB55B}
 
 \usepackage{listings}
 \lstset{
@@ -75,10 +76,11 @@
     numberstyle=\tiny\color{gray},
     keywordstyle=\color{blue},
     commentstyle=\color{dkgreen},
-    stringstyle=\color{mauve},
+    stringstyle=\color{grellow},
     breaklines=true,
     breakatwhitespace=true,
-    tabsize=4
+    tabsize=4,
+    upquote=true,
 }
 \thicklines
 
@@ -283,7 +285,7 @@
             \hline
 
             \captionsetup{width=\linewidth}
-            \caption{Descriptions of all the code files in the project repository.}
+            \ccaption{Descriptions of all the code files in the project repository.}
             \label{tab:code-files}
 
         \end{tabularx}
@@ -321,7 +323,8 @@
     
         \centerfig{0.6}{ml-circuit.jpg}
 
-        \caption{Equivalent circuit of Morris-Lecar neuron model. Only $g_{Ca}$ and $g_K$ may vary with time--the other parameters in this diagram are constants. Diagram copied from \cite{ml}.}
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{Equivalent circuit of Morris-Lecar neuron model. Only $g_{Ca}$ and $g_K$ may vary with time--the other parameters in this diagram are constants. This diagram is copied from \cite{ml}.}
         \label{fig:ml-circuit}
     
     \end{figure}
@@ -420,7 +423,8 @@
 
         \end{subtable}
 
-        \caption{Values of parameters used in the Morris-Lecar model. These values are assumed for the remainder of the report unless specified otherwise.}
+        \captionsetup{width=0.85\linewidth}
+        \ccaption{Values of parameters used in the Morris-Lecar model. These values are assumed for the remainder of the report unless specified otherwise.}
         \label{tab:ml-param}
 
     \end{table}
@@ -484,12 +488,14 @@
 
     % Bifurcation diagram
     Put all together, the bifurcation diagram is given in \reffig{fig:bautin}
-    \begin{figure}
+    \begin{figure}[h]
 
         \centering
     
         \centerfig{0.65}{bautin.jpg}
-        \caption{TODO + cite Kunetzsov}
+
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{Bifurcation diagram of Bautin bifurcation. This figure was obtained from \cite{kuznetsov}. This diagram labels $\alpha$ and $l_1$ as $\beta_1$ and $\beta_2$, respectively.}
     
         \label{fig:bautin}
     
@@ -506,10 +512,150 @@
 
     \subsection{Morris-Lecar Dynamics}
 
+    % Bautin bifurcation
+    A Bautin bifurcation exists for the Morris-Lecar neuron in the parameters $(I, \phi)$ near $(I, \phi) = (90, 0.04)$. The bifurcation diagram is given in \reffig{fig:ml-bautin}.
+    \begin{figure}[h]
+
+        \centering
+    
+        \centerfig{0.7}{ml-bautin.jpg}
+
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{TODO: get better image (maybe plot in python?)}
+    
+        \label{fig:ml-bautin}
+    
+    \end{figure}
+    We see that $(I, \phi) = (90, 0.04)$ corresponds to a system of type 3 in \reffig{fig:bautin}. The salient feature here is that there is a fixed point inside an unstable limit cycle inside a stable limit cycle. Corroborating this result, we keep $\phi = 0.04$ fixed and vary $I$ only. That gives us the bifurcation diagram in \reffig{fig:ml-bif1}.
+    \begin{figure}[h]
+
+        \centering
+    
+        \centerfig{0.8}{ml-bif1.jpg}
+
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{TODO: get better image (maybe plot in python?)}
+    
+        \label{fig:ml-bif1}
+    
+    \end{figure}
+
+    % Quiescent vs spiking oscillations
+    In the $(v, w)$ phase plane, trajectories closing in on the fixed point represent \textit{quiescent} oscillations. In contrast, trajectories orbiting near the stable limit cycle exhibit \textit{spiking} oscillations. Since this system is bistable, these are the only types of oscillations that can arise. The switching between the quiescent and spiking states describe neuronal behaviour and is of interest to us. Example phase portraits and corresponding $v(t)$ signals of deterministic quiescent and spiking oscillations are given in \reffig{fig:q-plots} and \reffig{fig:s-plots}, respectively.
+
+    \begin{figure}[!h]
+
+        \centering
+    
+        % v(t)
+        \begin{subfigure}{\textwidth}
+            \centerfig{0.7}{qvt.jpg}
+            \caption{}
+        \end{subfigure}
+
+        % Phase portrait
+        \begin{subfigure}{\textwidth}
+            \centerfig{0.7}{qpp.jpg}
+            \caption{}
+        \end{subfigure}
+    
+        \captionsetup{width=0.9\linewidth}
+        \ccaption{Quiescent trajectory with initial point $(-30.0, 0.15)$ and $t_{max} = 400$. As is the case for this report, voltage and time have units of $mV$ and $ms$, respectively.}
+        \label{fig:q-plots}
+    
+    \end{figure}
+
+    \begin{figure}[!h]
+
+        \centering
+    
+        % v(t)
+        \begin{subfigure}{\textwidth}
+            \centerfig{0.7}{svt.jpg}
+            \caption{}
+        \end{subfigure}
+
+        % Phase portrait
+        \begin{subfigure}{\textwidth}
+            \centerfig{0.7}{spp.jpg}
+            \caption{}
+        \end{subfigure}
+    
+        \captionsetup{width=0.9\linewidth}
+        \ccaption{Spiking trajectory with initial point $(-30.0, 0.1)$ and $t_{max} = 400$.}
+        \label{fig:s-plots}
+    
+    \end{figure}
+
+    % Running code
+    These figures can be reproduced by running the \texttt{ml} script:
+    \begin{lstlisting}
+        python -m scripts.ml
+    \end{lstlisting}
+    To get a deterministic trajectory, set the \texttt{stochastic\_method} variable in the \texttt{scripts/ml.py} file to \texttt{None}:
+    \begin{lstlisting}
+        stochastic_method = None
+    \end{lstlisting}
+    For a quiescent trajectory, set the initial condition
+    \begin{lstlisting}
+        x0 = np.array([-30.0, 0.15])
+    \end{lstlisting}
+    and run the script. Meanwhile, for a spiking trajectory, set the initial condition
+    \begin{lstlisting}
+        x0 = np.array([-30.0, 0.1])
+    \end{lstlisting}
+    and run the script.
+
     \subsection{Scaling Results}
 
+    % Attribute MatCont
+    The results in this section were obtained with the use of \texttt{MATCONT} \cite{matcont}.
+
+    % Im(eig) ~ sqrt(phi)
+    Some potentially interesting scaling results in the Morris-Lecar neuron were obtained. First, along the $H_+$ curve in the Bautin bifurcation diagram, the fixed point has two imaginary eigenvalues that are conjugates of each other (since the real part goes to zero for Hopf bifurcations). It turns out that this imaginary part $\omega$ scales as $\sqrt{\phi}$:
+    \begin{equation}
+        \omega \sim \sqrt{\phi}
+    \end{equation}
+
+    This fit is compared to the numerical data in \reffig{fig:phi-im-scale}.
+    \begin{figure}[!h]
+
+        \centering
+ 
+        \centerfig{0.8}{phi-im-scale.jpg}
+    
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{Comparison of fit power law scaling and actual numerical data for $\omega(\phi)$ at small $\phi$. The fit obeys the equation $\omega = 0.4\sqrt{\phi}$.}
+        \label{fig:phi-im-scale}
+    
+    \end{figure}
+
+    This agrees with the theoretical result obtained in \cite{baer} (in that paper, the authors use $\varepsilon$ and $\lambda$ in place of $\phi$ and $I$, respectively).
+
+    % Bifurcation curve fitting
+    The scaling between $I$ and $\phi$ along the $H_+$ and SNLC curves for small $\phi$ was also investigated. Along the $H_+$ curve we have:
+    \begin{equation}
+        I \sim \phi
+    \end{equation}
+    Along the SNLC curve we get:
+    \begin{equation}
+        I \sim \phi^{4/3}
+    \end{equation}
+    These fits are compared to numerical data in \reffig{fig:bif-scale}.
+    \begin{figure}[!h]
+
+        \centering
+ 
+        \centerfig{0.8}{bif-scale.jpg}
+    
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{Comparison of fit power law scaling and actual numerical data for $I(\phi)$ at small $\phi$ along the $H_+$ and SNLC bifurcation curves. The fits obey the relationships $I = 300 \: \phi$ and $I = 333.3 \: \phi^{4/3}$ along the $H_+$ and SNL curves, respectively.}
+        \label{fig:bif-scale}
+    
+    \end{figure}
+
     \subsection{Helpful Resources}
-    TODO
+    The book \cite{strogatz} provides an excellent introduction to bifurcation theory. A more advanced book on bifurcation theory is \cite{kuznetsov}. Meanwhile, the software \texttt{MATCONT} \cite{matcont}, which can be run through MATLAB, is really useful for numerical bifurcations. A helpful tutorial guide for \texttt{MATCONT} is \cite{matcont-tut}.
 
     \pagebreak
 
@@ -517,8 +663,7 @@
 
     \subsection{It\^o Calculus}
 
-    % Wiener process TODO: cite finbook
-    $X_t$ is a \textit{Wiener process} iff it is a continuous-time stochastic process satisfying the following conditions:
+    $X_t$ is a \textit{Wiener process} iff it is a continuous-time stochastic process satisfying the following conditions \cite{finbook}:
     \begin{enumerate}
         \item \textbf{Stationary increments:} If $s \leq t$, $X_t - X_s$ has the same distribution as $X_{t-s} - X_0$.
         \item \textbf{Independent increments:} If $s \leq t$, $X_t - X_s$ is independent of $X_r$ for all $r \leq s$.
@@ -585,6 +730,53 @@
         h(v, w) &= \frac{1}{\sqrt{N_K}}\sqrt{\alpha(v) (1 - w) + \beta(v) w}
     \end{align}
 
+    % Example stochastic trajectories
+    Example phase portraits and corresponding $v(t)$ signals of stochastic quiescent and spiking oscillations are given in \reffig{fig:sq-plots} and \reffig{fig:ss-plots}. Note that the trajectory in \reffig{fig:sq-plots} transitions between quiescent and spiking states, as opposed to staying in the quiescent state like its deterministic counterpart. Such transitioning between quiescent and spiking states make the neuronal behaviour interesting and is worthy of closer investigation.
+
+    \begin{figure}[!h]
+
+        \centering
+    
+        % v(t)
+        \begin{subfigure}{\textwidth}
+            \centerfig{0.7}{sqvt.jpg}
+            \caption{}
+        \end{subfigure}
+
+        % Phase portrait
+        \begin{subfigure}{\textwidth}
+            \centerfig{0.7}{sqpp.jpg}
+            \caption{}
+        \end{subfigure}
+    
+        \captionsetup{width=0.85\linewidth}
+        \ccaption{Stochastic trajectory with initial point $(-30.0, 0.15)$ and $t_{max} = 400$. Parts of the trajectory are quiescent while other parts are spiking.}
+        \label{fig:sq-plots}
+    
+    \end{figure}
+
+    \begin{figure}[!h]
+
+        \centering
+    
+        % v(t)
+        \begin{subfigure}{\textwidth}
+            \centerfig{0.7}{ssvt.jpg}
+            \caption{}
+        \end{subfigure}
+
+        % Phase portrait
+        \begin{subfigure}{\textwidth}
+            \centerfig{0.7}{sspp.jpg}
+            \caption{}
+        \end{subfigure}
+    
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{Stochastic spiking trajectory with initial point $(-30.0, 0.1)$ and $t_{max} = 400$.}
+        \label{fig:ss-plots}
+    
+    \end{figure}
+
     \subsection{Euler-Maruyama Method}
 
     % General description
@@ -596,6 +788,17 @@
 
     % ML-specific
     To ease computations, only the second entry of $\mathbf{Z}$ needs to be generated for the 2-dimensional stochastic Morris-Lecar model (since only $\mathbf{H_{22}}$ is nonzero). Furthermore, the random numbers can all be generated at the start rather than at every iteration.
+
+    % Running code
+    The Euler-Maruyama method is implemented in the project's software. One such script that utilizes this is \texttt{scripts/ml.py}. Here a stochastic trajectory of the Morris-Lecar neuron can be simulated using the Euler-Maruyama method. This can be done by first setting the appropriate stochastic method in the file:
+    \begin{lstlisting}
+        stochastic_method = 'euler'
+    \end{lstlisting}
+    Then the script can be run in a terminal:
+    \begin{lstlisting}
+        python -m scripts.ml
+    \end{lstlisting}
+    The plots in \reffig{fig:sq-plots} and \reffig{fig:ss-plots} can be reproduced (up to stochastic noise) by running this script with the Euler-Maruyama method.
 
     \subsection{Helpful Resources}
     The book \cite{finbook} provides a great introduction to stochastic calculus.
