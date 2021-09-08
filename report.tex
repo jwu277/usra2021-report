@@ -115,7 +115,7 @@
 \newcommand*{\abs}[1]{\left| #1 \right|}
 \newcommand*{\norm}[1]{\abs{\abs{\mathbf{#1}}}}
 
-\newcommand*{\ev}[1]{\left<#1\right>}
+\newcommand*{\ev}[1]{\mathbb{E}\left[#1\right]}
 
 \renewcommand*{\Re}[1]{\text{Re}\left(#1\right)}
 \renewcommand*{\Im}[1]{\text{Im}\left(#1\right)}
@@ -224,7 +224,7 @@
             \hline
             \texttt{neurons/mll.py} & Linear Morris-Lecar neuron ($\tilde{\tilde{\mathbf{x}}}$) & Needs to be initialized with \texttt{init} before usage \\
             \hline
-            \texttt{neurons/mlr.py} & Linear Distance Morris-Lecar neuron & Not really used. Simulates the modulus of the linear Morris-Lecar neuron. \\
+            \texttt{neurons/mlr.py} & Linear Modulus Morris-Lecar neuron & Not really used. Simulates the modulus of the linear Morris-Lecar neuron. \\
             \hline
             \texttt{neurons/modelb.py} & ``Model B'' neuron; related to the patched model. & Patched model still needs to be investigated further, so work can still be done here. \\
             \hline
@@ -240,7 +240,7 @@
             \hline
             \texttt{scripts/elstats.py} & TODO & ipsum \\
             \hline
-            \texttt{scripts/isih.py} & TODO & ipsum \\
+            \texttt{scripts/isih.py} & ISI histogram generator for Morris-Lecar neuron & \\
             \hline
             \texttt{scripts/izhikevich.py} & ISI distribution simulation for the Izhikevich neuron withPoisson current & Not really used and might have inconsistent units \\
             \hline
@@ -254,7 +254,7 @@
             \hline
             \texttt{scripts/mll.py} & Simulation of a single trajectory of the linear Morris-Lecar neuron & \\
             \hline
-            \texttt{scripts/mlrtrials.py} & TODO & ipsum \\
+            \texttt{scripts/mlrtrials.py} & Simulates distribution of exit times for the \texttt{mlr} neuron & \\
             \hline
             \texttt{scripts/modelb.py} & Simulation of a single trajectory of the Model B neuron & \\
             \hline
@@ -264,9 +264,7 @@
             \hline
             \texttt{scripts/plotter.py} & Makes an animated plot of a phase portrait trajectory & Requires ImageMagick to be installed \\
             \hline
-            \texttt{scripts/poincare.py} & TODO & ipsum \\
-            \hline
-            \texttt{scripts/sandbox.py} & Sandbox to play around in & \\
+            \texttt{scripts/poincare.py} & Computes statistics for the $L$ Poincare section (described later in this report) & \\
             \hline
             \texttt{util/current.py} & Generates $I(t)$ signal & \\
             \hline
@@ -534,14 +532,14 @@
         \centerfig{0.8}{ml-bif1.jpg}
 
         \captionsetup{width=0.8\linewidth}
-        \ccaption{TODO: get better image (maybe plot in python?)}
+        \ccaption{Bifurcation diagram with $\phi = 0.04$ fixed and $I$ varied. The value of $v$ at the fixed point, as well as extremal values of $v$ along the stable (SLC) and unstable (ULC) limit cycles are tracked.}
     
         \label{fig:ml-bif1}
     
     \end{figure}
 
     % Quiescent vs spiking oscillations
-    In the $(v, w)$ phase plane, trajectories closing in on the fixed point represent \textit{quiescent} oscillations. In contrast, trajectories orbiting near the stable limit cycle exhibit \textit{spiking} oscillations. Since this system is bistable, these are the only types of oscillations that can arise. The switching between the quiescent and spiking states describe neuronal behaviour and is of interest to us. Example phase portraits and corresponding $v(t)$ signals of deterministic quiescent and spiking oscillations are given in \reffig{fig:q-plots} and \reffig{fig:s-plots}, respectively.
+    In the $(v, w)$ phase plane, trajectories closing in on the fixed point represent \textit{quiescent} oscillations. In contrast, trajectories orbiting near the stable limit cycle exhibit \textit{spiking} oscillations. Since this system is bistable, these are the only types of oscillations that can arise. The switching between the quiescent and spiking states describe neuronal behaviour and is of interest to us. Example phase portraits and corresponding $v(t)$ signals of deterministic quiescent and spiking oscillations are given in \reffig{fig:q-plots} and \reffig{fig:s-plots}, respectively. Note that the phase portrait flows counterclockwise.
 
     \begin{figure}[!h]
 
@@ -622,7 +620,7 @@
     \end{equation}
 
     This fit is compared to the numerical data in \reffig{fig:phi-im-scale}.
-    \begin{figure}[!h]
+    \begin{figure}[h]
 
         \centering
  
@@ -886,8 +884,171 @@
 
     \pagebreak
 
-    \section{Poincare-Like Maps} % TODO change name?
-    TODO
+    \section{Poincare Maps}
+    
+    \subsection{Background}
+
+    % Poincare sections
+    A \textit{Poincare section} is a cross-sectional subset of a system's phase space that is transverse to oscillatory trajectories. For example, if we let $(v_{eq}, w_{eq})$ be the fixed point of the Morris-Lecar neuron, we can define the two Poincare sections $L, L'$ as:
+    \begin{align}
+        L &= \{(v, w) \: s.t. \: v = v_{eq}, w \leq w_{eq}\} \\
+        L' &= \{(v, w) \: s.t. \: v = v_{eq}, w \geq w_{eq}\}
+    \end{align}
+    These subsets are depicted in \reffig{fig:pmap-def}.
+    \begin{figure}[h]
+
+        \centering
+ 
+        \centerfig{0.9}{pmap-def.jpg}
+    
+        \captionsetup{width=0.75\linewidth}
+        \ccaption{Plot of the Poincare sections in the $(v, w)$ phase plane. The fixed point and limit cycles are included for comparison.}
+        \label{fig:pmap-def}
+    
+    \end{figure}
+
+    % Poincare maps
+    Indeed, trajectories such as those in \reffig{fig:q-plots} and \reffig{fig:s-plots} cross each of $L, L'$ once per oscillation. More formally, for a deterministic system, if we abbreviate $\mathbf{x}(t) = (v(t), w(t))$, then a time $t^*$ is a \textit{crossing time} through a Poincare section $S$ iff $\mathbf{x}(t) \in S$. So long as the trajectories are not tangent to the subset, there are only countably many crossing times. This is intuitively clear because trajectories must ``shoot through'' the section and cannot remain on it for more than an instant of time. We associate with every crossing time $t^*$ a \textit{crossing point} $\mathbf{x}(t^\ast) \in S$. We can thus define a function $P: S \to S$ for a Poincare section $S$, where $P(\mathbf{x}) = \mathbf{y}$ iff a trajectory starting at $\mathbf{x}$ has its next crossing point at $\mathbf{y}$ (the existence of $\mathbf{y}$ is guarenteed by how $S$ is transverse to oscillatory motion by definition; meanwhile, the uniqueness comes from the Well-Ordering Principle). The $P(\mathbf{x})$ function is known as a \textit{Poincare map}. We can similarly define the function $T(\mathbf{x}) : S \to \mathbf{R}$, where $T(\mathbf{x})$ is the next crossing time of a trajectory starting at $\mathbf{x}$. We shall call $T(\mathbf{x})$ the \textit{Poincare timer}.
+
+    % Poincare section parameterization
+    The $L$ and $L'$ sections are one-dimensional, so it helps to parametrize them by a single real parameter. Using the parameters $\psi, \psi' \geq 0$, we can parametrize $\psi \leftrightarrow (v_{eq}, w_{eq} - \psi)$ and $\psi' \leftrightarrow (v_{eq}, w_{eq} + \psi)$ for $L$ and $L'$, respectively. We then have the functions $P(\psi)$ and $T(\psi)$ (or $P(\psi')$ and $T(\psi')$) as the Poincare map and Poincare timer.
+
+    % Examples
+    As an example, the Poincare map for $L$ is plotted in \reffig{fig:pmap-det}.
+    \begin{figure}[h]
+
+        \centering
+ 
+        \centerfig{0.8}{pmap-det.jpg}
+    
+        \captionsetup{width=0.75\linewidth}
+        \ccaption{Deterministic Poincare map for the $L$ section.}
+        \label{fig:pmap-det}
+    
+    \end{figure}
+    Notice that there are three fixed points (i.e. $P(\psi) = \psi$) of the Poincare map. In order of increasing $\psi$, these correspond to the system's fixed point, unstable limit cycle, and stable limit cycle. Of course, fixed points of a deterministic Poincare map will always correspond to equilibria or limit cycles, and vice versa. The stability of the system's equilibria and limit cycles can then be inferred from the Poincare map. Here, we see that $P(\psi) < \psi$ for points between the fixed point and ULC. This implies that the fixed point is stable while the ULC is indeed unstable from the inside. This is because trajectories in this region move closer towards the fixed point after each oscillation. Similarly, the fact that $P(\psi) > \psi$ between the ULC and SLC further confirms that the ULC is unstable from the outside and that the SLC is stable from the inside. Finally, $P(\psi) < \psi$ outside the SLC shows that the SLC is indeed stable from the outside.
+
+    % Stochastic Poincare map
+    Finally, for a stochastic system, $P(\psi)$ and $T(\psi)$ are no longer real numbers but are instead random variables. The distributions of $P(\psi)$ and $T(\psi)$, and how they change with $\psi$ become of interest.
+
+    \subsection{Numerical Implementation}
+
+    % Description
+    Crossing times for $L$ and $L'$ can be computed numerically from a given signal by first keeping track of $v_{eq}$ crossings for $v(t)$. In an e.g. Euler-Maruyama simulation, the signal will be an array of values $v[i]$, with $i$ being the index. The indices $i$ correspond to times $t_i$ i.e. $v[i] \approx v(t_i)$. Then since $v(t)$ crosses $L$ rightwards (recall that the trajectories floe counterclockwise in the phase plane), we check that $v[i] \leq v_{eq}$ and $v[i+1] \geq v_{eq}$. Finally, we check that the value of $w$ is correct: $w[i] \leq w_{eq}$. When these criteria are satisfied, $t_i$ is accepted as a crossing time. Likewise, $(v[i], w[i])$ is accepted as the associated crossing point. A similar case holds for $L'$ except $v[i] \geq v_{eq}$, $v[i+1] \leq v_{eq}$, and $w[i] \geq w_{eq}$.
+
+    % Code
+    The \texttt{scripts.poincare} script uses this logic to compute $P(\psi)$ and $T(\psi)$ distributions, as well as how frequently a given oscillation spikes for a certain $\psi$.
+
+    \subsection{Results}
+
+    % Summary of P(psi), T(psi), spiking probability
+    For noise at the $N_K = 2000$ level (recall that noise amplitude is proportional to $N_K^{-1/2}$), the distinct sigmoid shape of the Poincare map in \reffig{fig:pmap-det} (we consider $\ev{P(\psi)}$ for the stochastic system) disappears. Of course, there are levels of noise that are weak enough to retain the sigmoidal shape of $\ev{P(\psi)}$ while still having an appreciable variance in $P(\psi)$. This latter quality allows for transitions between spiking and quiescent states, and gives rise to a distribution of ISIs. Plots of $\ev{P(\psi)}$, $\ev{T(\psi)}$, and spiking probabilities versus $\psi$ for $N_K = 2000, 2 \times 10^6$ are given in \reffig{fig:poincare}.
+
+    \begin{figure}[!h]
+
+        \centering
+
+        \begin{subfigure}{0.72\textwidth}
+            \includegraphics[width=\linewidth]{img/pmap-nk2000.jpg}
+            \caption{$\ev{P(\psi)}$ versus $\psi$ for $N_K = 2000$}
+        \end{subfigure}
+    
+        \begin{subfigure}{0.72\textwidth}
+            \includegraphics[width=\linewidth]{img/pmap-nk2000000.jpg}
+            \caption{$\ev{P(\psi)}$ versus $\psi$ for $N_K = 2000000$}
+        \end{subfigure}
+        
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{Plots of various Poincare statistics. Each of the 100 trials constituted running a single oscillation for every value of $\psi$.}
+
+    \end{figure}
+    \begin{figure}[!h]\ContinuedFloat
+
+        \centering
+
+        \begin{subfigure}{0.72\textwidth}
+            \includegraphics[width=\linewidth]{img/pt-nk2000.jpg}
+            \caption{$\ev{T(\psi)}$ versus $\psi$ for $N_K = 2000$}
+        \end{subfigure}
+    
+        \begin{subfigure}{0.72\textwidth}
+            \includegraphics[width=\linewidth]{img/pt-nk2000000.jpg}
+            \caption{$\ev{T(\psi)}$ versus $\psi$ for $N_K = 2000000$}
+        \end{subfigure}
+
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{Plots of various Poincare statistics. Each of the 100 trials constituted running a single oscillation for every value of $\psi$. (cont.)}
+
+    \end{figure}
+    \begin{figure}[!h]\ContinuedFloat
+
+        \centering
+
+        \begin{subfigure}{0.72\textwidth}
+            \includegraphics[width=\linewidth]{img/pspike-nk2000.jpg}
+            \caption{Spiking frequency versus $\psi$ for $N_K = 2000$}
+        \end{subfigure}
+    
+        \begin{subfigure}{0.72\textwidth}
+            \includegraphics[width=\linewidth]{img/pspike-nk2000000.jpg}
+            \caption{Spiking frequency versus $\psi$ for $N_K = 2000000$}
+        \end{subfigure}
+
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{Plots of various Poincare statistics. Each of the 100 trials constituted running a single oscillation for every value of $\psi$. (cont.)}
+        \label{fig:poincare}
+
+    \end{figure}
+
+    % pdist
+    For weak noise (e.g. $N_K = 2 \times 10^6$), the $P(\psi)$ distributions is bimodal when $\psi$ is near the ULC i.e. $\psi \approx 0.017$. If $\psi$ is much more or less than this, the distribution becomes seemingly unimodal. A few of these simulated distributions are given in \reffig{fig:pdist}.
+    \begin{figure}[!h]
+
+        \centering
+
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\linewidth]{img/pdist-psi0005.jpg}
+            \caption{$\psi = 0.005$}
+            \label{fig:pdist-psi0005}
+        \end{subfigure}
+
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\linewidth]{img/pdist-psi0017.jpg}
+            \caption{$\psi = 0.017$}
+            \label{fig:pdist-psi0017}
+        \end{subfigure}
+
+        \captionsetup{width=\linewidth}
+        \ccaption{Simulation of the distribution of $P(\psi)$ for various values of $\psi$.}
+
+    \end{figure}
+    \begin{figure}[!h]\ContinuedFloat
+
+        \centering
+    
+        \begin{subfigure}{0.75\textwidth}
+            \includegraphics[width=\linewidth]{img/pdist-psi002.jpg}
+            \caption{$\psi = 0.02$}
+            \label{fig:pdist-psi002}
+        \end{subfigure}
+
+        \captionsetup{width=\linewidth}
+        \ccaption{Simulation of the distribution of $P(\psi)$ for various values of $\psi$. (cont.)}
+        \label{fig:pdist}
+
+    \end{figure}
+
+    % Explain pdist
+    One explanation of the unimodal/bimodal distributions is that the modes correspond to the stable states of the system i.e. the fixed point and SLC. So inside the ULC, the system will be attracted to the fixed point and therefore exhibit the distribution associated with the fixed point (as in \reffig{fig:pdist-psi0005}). Now, outside the ULC, the system is attracted to the SLC and thus produces the corresponding mode (as in \reffig{fig:pdist-psi002}). However, near the ULC, the stochastic noise can push the trajectory across to either side of the ULC. This results in a superposition of the fixed point and SLC modes in the histogram (as in \reffig{fig:pdist-psi0017}).
+
+    % Explain centering of modes
+    The mode associated with the SLC is indeed maximal at approximately the value of $\psi$ corresponding to the SLC (i.e. the intersection of the SLC and $L$). However, the mode associated with the fixed point is not maximal at $\psi = 0$, where the fixed point is located. One reason this discrepancy arises is that the SLC attraction is strong in the sense that deterministic trajectories typically converge near it within one oscillation. In contrast, trajectories will spiral towards the fixed point (at the speed of exponentially decay) as seen in \reffig{fig:q-plots-pp}. So if we naively assume the modes to be maximal at the deterministic $P(\psi)$, we would expect the SLC mode to exist as such and the fixed point mode to be offset from $\psi = 0$. Another reason for the offset is the one-sidedness of $L$ i.e. that $\psi$ is nonnegative. To illustrate, if a deterministic were to reach a small neighbourhood of the fixed point (for concreteness we make the neighbourhood diameter much smaller than the noise amplitude multiplied by the square root of the time scale i.e. the oscillation period ~ 80 ms), Brownian motion in \textit{any} direction will cause a deviation from the fixed point. If the system is perturbed in direction of decreasing $w$, $P(\psi)$ would increase as usual. However, if the system is instead disturbed in the direction of increasing $w$, the trajectory will be above the fixed point and effectively become a trajectory that is halfway through an oscillation; the phase portrait will then circle around and hit $L$ at a location below the fixed point.
+
+    % Code: poincare
+    The script used to generate the various Poincare statistics in \reffig{fig:poincare} can be found in \texttt{scripts.poincare}. Variables of interest to change are \texttt{Nk}, \texttt{psi\_range} (which defines the values of $\psi$ to be probed) and \texttt{trials} (the number of trials to perform). 
+    
+    % Code: pdist
+    Meanwhile, the script used to generate the distributions of $P(\psi)$ for specific values of $\psi$ is contained in \texttt{scripts.pdist}. This script additionally generates histograms for $T(\psi)$ and spiking frequency for fixed $\psi$. Some variables to change here include \texttt{Nk}, \texttt{psi}, and \texttt{trials}.
 
     \pagebreak
 
@@ -999,6 +1160,15 @@
 
     \section{Patched Model}
     % TODO
+
+    \subsection{Description}
+    D
+
+    \subsection{Motivation}
+    S
+
+    \subsection{Current Results}
+    T
 
     \section{Next Steps}
     % TODO
