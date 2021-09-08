@@ -258,13 +258,13 @@
             \hline
             \texttt{scripts/modelb.py} & Simulation of a single trajectory of the Model B neuron & \\
             \hline
-            \texttt{scripts/pdist.py} & TODO & ipsum \\
+            \texttt{scripts/pdist.py} & Simulates Poincare statistics (described later in this report) for a fixed values of $\psi$ & \\
             \hline
             \texttt{scripts/phi\_noise.py} & Saves a run of Morris-Lecar neuron for certain values of$\phi$ and $N_K$ & Filename for save should be renamed as desired \\
             \hline
             \texttt{scripts/plotter.py} & Makes an animated plot of a phase portrait trajectory & Requires ImageMagick to be installed \\
             \hline
-            \texttt{scripts/poincare.py} & Computes statistics for the $L$ Poincare section (described later in this report) & \\
+            \texttt{scripts/poincare.py} & Computes statistics for the $L$ Poincare section & \\
             \hline
             \texttt{util/current.py} & Generates $I(t)$ signal & \\
             \hline
@@ -516,10 +516,10 @@
 
         \centering
     
-        \centerfig{0.7}{ml-bautin.jpg}
+        \centerfig{0.8}{ml-bautin.jpg}
 
-        \captionsetup{width=0.8\linewidth}
-        \ccaption{TODO: get better image (maybe plot in python?)}
+        \captionsetup{width=0.7\linewidth}
+        \ccaption{Bautin bifurcation diagram, produced using \cite{matcont}. The red cross represents the origin of the Bautin bifurcation.}
     
         \label{fig:ml-bautin}
     
@@ -532,7 +532,7 @@
         \centerfig{0.8}{ml-bif1.jpg}
 
         \captionsetup{width=0.8\linewidth}
-        \ccaption{Bifurcation diagram with $\phi = 0.04$ fixed and $I$ varied. The value of $v$ at the fixed point, as well as extremal values of $v$ along the stable (SLC) and unstable (ULC) limit cycles are tracked.}
+        \ccaption{Bifurcation diagram, produced using \cite{matcont}, with $\phi = 0.04$ fixed and $I$ varied. The value of $v$ at the fixed point, as well as extremal values of $v$ along the stable (SLC) and unstable (ULC) limit cycles are tracked.}
     
         \label{fig:ml-bif1}
     
@@ -1150,11 +1150,56 @@
         d\tilde{\tilde{\mathbf{x}}} = -\lambda\tilde{\tilde{\mathbf{x}}} + R_{\omega t}\mathbf{c}
     \end{equation}
 
+    % R model
+    Finally, it helps to define
+    \begin{equation}
+        \mathbf{b} = \mathbf{Q}^{-1} \qvec{0}{\frac{0.1003}{\sqrt{N_K}}} \; \therefore \; \mathbf{c} = \mathbf{b} \, dB_t
+    \end{equation}
+    Now we can define a one-parameter model near the fixed point as follows. If we first define (actually, that $\abs{\mathbf{b}}$ is the trace of the covariance matrix):
+    \begin{align}
+        \tau &= \frac{\abs{\mathbf{b}}}{\sqrt{2}} \\
+        \mathbf{U}_t &= \frac{\sqrt{\lambda}}{\tau} \tilde{\tilde{\mathbf{x}}}_{t/\lambda}
+    \end{align}
+    Then the $\mathbf{U}_t$ process is scaled to have unit decay rate:
+    \begin{equation}
+        d\mathbf{U}_t = -\mathbf{U}_t dt + \frac{1}{\tau} R_{\omega t/\lambda} \mathbf{c}
+    \end{equation}
+    According to \cite{baxendale}, the $\mathbf{U}_t$ process converges to the simpler process $\mathbf{S}_t$ (where $\mathbf{B}_t$ denotes a standard 2-dimensional Brownian motion)
+    \begin{equation}
+        d\mathbf{S}_t = -\mathbf{S}_t dt + \mathbf{dB_t}
+        \label{eqn:lin-s-eqn}
+    \end{equation}
+    when $\lambda/\omega \to 0$. The hypothesis to this claim is reasonable to assume, seeing that $\lambda$ is an order of magnitude less than $\omega$ for the $I = 90, \phi = 0.04$ neuron: $\lambda = 0.00860, \omega = 0.0801$. So the stochastic system is indeed approximately a unit Ornstein–Uhlenbeck process \textit{after an appropriate coordiantes and time transformation} near the fixed point. We can subsequently treat the 2-norm of $\mathbf{S}_t$ (recall that $\mathbf{S}_t$ is a 2-dimensional stochastic process) as a one-parameter system thanks to the isotropy of (\ref{eqn:lin-s-eqn}).
+    \begin{equation}
+        R_t = \abs{\mathbf{S}_t}
+    \end{equation}
+    It can be shown with It\^o calculus that this ``R'' model obeys the equation
+    \begin{equation}
+        dR = \left(\frac{1}{2R} - R\right) dt + dB_t
+    \end{equation}
+    where $B_t$ is a standard one-dimensional Brownian motion.
+
     \subsection{Numerical Comparison}
-    TODO
+
+    % Deterministic comparison
+    A comparison of the Euler-Maruyama, Jacobi, and linear models for a deterministic Morris-Lecar neuron is given in \reffig{fig:det-comp}. Since the Euler-Maruyama and Jacobi models differ only in the noise term, the two have the same deterministic dynamics. Otherwise, the linear and nonlinear models appear to exhibit similar behaviour (at least, qualitatively) near the fixed point for the trajectories in \reffig{fig:det-comp}. A comparison of these models with a stochastic neuron is given later in this report.
+    \begin{figure}[h]
+
+        \centering
+ 
+        \centerfig{0.8}{det-comp.jpg}
+    
+        \captionsetup{width=0.85\linewidth}
+        \ccaption{Comparison of quisecent deterministic trajectories for nonlinear (Euler-Maruyama and Jacobi) and linear models of the Morris-Lecar neuron. The fixed point ellipse (FPE) is defined later in the report.}
+        \label{fig:det-comp}
+    
+    \end{figure}
+
+    % Code
+    The \texttt{mlj}, \texttt{mll}, and \texttt{mlr} neurons (in the \texttt{neurons} subdirectory) correspond to the Jacobi, linear, and ``R'' Morris-Lecar models, respectively. These can be instantiated through the constructor or from an existing \texttt{ml} neuron with \texttt{ml.gen\_model}. After that, the \texttt{init} method must be called on these neurons before they are used.
 
     \subsection{Helpful Resources}
-    The article \cite{dg} discusses these alternative models as well.
+    The article \cite{dg} discusses the Jacobi, linear, and ``R'' models as well.
 
     \pagebreak
 
@@ -1169,6 +1214,8 @@
 
     \subsection{Current Results}
     T
+
+    \pagebreak
 
     \section{Next Steps}
     % TODO
