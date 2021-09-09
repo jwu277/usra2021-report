@@ -146,6 +146,7 @@
 % References
 \newcommand{\reffig}[1]{\textbf{Figure \ref{#1}}}
 \newcommand{\reftab}[1]{\textbf{Table \ref{#1}}}
+\newcommand{\refsec}[1]{\textbf{Section \ref{#1}}}
 
 % Header
 \lhead{}
@@ -226,19 +227,19 @@
             \hline
             \texttt{neurons/mlr.py} & Linear Modulus Morris-Lecar neuron & Not really used. Simulates the modulus of the linear Morris-Lecar neuron. \\
             \hline
-            \texttt{neurons/modelb.py} & ``Model B'' neuron; related to the patched model. & Patched model still needs to be investigated further, so work can still be done here. \\
+            \texttt{neurons/modelb.py} & ``Model B'' neuron & Patched model still needs to be investigated further, so work can still be done here. \\
             \hline
             \texttt{scripts/bm.py} &  ISI distribution simulation for the binary Markov neuron & \\
             \hline
-            \texttt{scripts/contour.py} & TODO & ipsum \\
+            \texttt{scripts/contour.py} & Generates FPE and ULC contours & \\
             \hline
             \texttt{scripts/det.py} & Compares deterministic trajectories of different neuron models & \\
             \hline
-            \texttt{scripts/docheck.py} & TODO & ipsum \\
+            \texttt{scripts/docheck.py} & Counts invalid oscillations in Model B2 & \\
             \hline
-            \texttt{scripts/dtstab.py} & Compares different values of $dt$ and numerical methods(currently Euler and RK45) & $dt = 0.1$ suffices. Also, no appreciable difference was observed between the Euler and RK45 methods. \\
+            \texttt{scripts/dtstab.py} & Compares different values of $dt$ and numerical methods (currently Euler and RK45) & $dt = 0.1$ suffices. Also, no appreciable difference was observed between the Euler and RK45 methods. \\
             \hline
-            \texttt{scripts/elstats.py} & TODO & ipsum \\
+            \texttt{scripts/elstats.py} & Generates statistical Poincare data for the FPE & \\
             \hline
             \texttt{scripts/isih.py} & ISI histogram generator for Morris-Lecar neuron & \\
             \hline
@@ -258,7 +259,7 @@
             \hline
             \texttt{scripts/modelb.py} & Simulation of a single trajectory of the Model B neuron & \\
             \hline
-            \texttt{scripts/pdist.py} & Simulates Poincare statistics (described later in this report) for a fixed values of $\psi$ & \\
+            \texttt{scripts/pdist.py} & Simulates Poincare statistics for a fixed values of $\psi$ & \\
             \hline
             \texttt{scripts/phi\_noise.py} & Saves a run of Morris-Lecar neuron for certain values of$\phi$ and $N_K$ & Filename for save should be renamed as desired \\
             \hline
@@ -283,7 +284,7 @@
             \hline
 
             \captionsetup{width=\linewidth}
-            \ccaption{Descriptions of all the code files in the project repository.}
+            \ccaption{Descriptions of all the code files in the project repository. Note that much of the technical terminology is explained later in the report.}
             \label{tab:code-files}
 
         \end{tabularx}
@@ -932,9 +933,10 @@
     Finally, for a stochastic system, $P(\psi)$ and $T(\psi)$ are no longer real numbers but are instead random variables. The distributions of $P(\psi)$ and $T(\psi)$, and how they change with $\psi$ become of interest.
 
     \subsection{Numerical Implementation}
+    \label{sec:pmap-numerical}
 
     % Description
-    Crossing times for $L$ and $L'$ can be computed numerically from a given signal by first keeping track of $v_{eq}$ crossings for $v(t)$. In an e.g. Euler-Maruyama simulation, the signal will be an array of values $v[i]$, with $i$ being the index. The indices $i$ correspond to times $t_i$ i.e. $v[i] \approx v(t_i)$. Then since $v(t)$ crosses $L$ rightwards (recall that the trajectories floe counterclockwise in the phase plane), we check that $v[i] \leq v_{eq}$ and $v[i+1] \geq v_{eq}$. Finally, we check that the value of $w$ is correct: $w[i] \leq w_{eq}$. When these criteria are satisfied, $t_i$ is accepted as a crossing time. Likewise, $(v[i], w[i])$ is accepted as the associated crossing point. A similar case holds for $L'$ except $v[i] \geq v_{eq}$, $v[i+1] \leq v_{eq}$, and $w[i] \geq w_{eq}$.
+    Crossing times for $L$ and $L'$ can be computed numerically from a given signal by first keeping track of $v_{eq}$ crossings for $v(t)$. In an e.g. Euler-Maruyama simulation, the signal will be an array of values $v[i]$, with $i$ being the index. The indices $i$ correspond to times $t_i$ i.e. $v[i] \approx v(t_i)$. Then since $v(t)$ crosses $L$ rightwards (recall that the trajectories flow counterclockwise in the phase plane), we check that $v[i] \leq v_{eq}$ and $v[i+1] \geq v_{eq}$. Finally, we check that the value of $w$ is correct: $w[i] \leq w_{eq}$. When these criteria are satisfied, $t_i$ is accepted as a crossing time. Likewise, $(v[i], w[i])$ is accepted as the associated crossing point. A similar case holds for $L'$ except $v[i] \geq v_{eq}$, $v[i+1] \leq v_{eq}$, and $w[i] \geq w_{eq}$.
 
     % Code
     The \texttt{scripts.poincare} script uses this logic to compute $P(\psi)$ and $T(\psi)$ distributions, as well as how frequently a given oscillation spikes for a certain $\psi$.
@@ -1204,7 +1206,7 @@
 
     \pagebreak
 
-    \section{Patched Model}
+    \section{Model B}
 
     \subsection{Description and Motivation}
 
@@ -1315,30 +1317,73 @@
     Tracking exits through $E$ and not $C$ is justified by noting that the partial oscillation crossing $E$ could spike or be quiescent, rendering the $E$ exit non-trivial in terms of ISIs. In contrast, partial oscillations exiting through $C$ will have either spiked or been quiescent \textit{already}, so there are not many interesting details beyond $C$ (other than the potential breakdown of the linear approximation).
 
     % Entrances
-    As for entrances into the FPE, we can again estimate conditional $P$ and $T$ maps, and keep track of where along the TODO
+    As for entrances into the FPE, we can again estimate conditional $P$ and $T$ maps, and keep track of where along $C$ or $E$ the trajectory enters. Again, this can be parametrized by $\theta$, the polar angle of $F$ as a circle in $\tilde{\mathbf{x}}$ space. One hope is that, intuitively, DO to IO transitions will nearly always enter through $C$, rather than $E$. In that case, we need only estimate the distributions for entry through $C$.
+
+    % Linear model for ISIs
+    Although the precise trajectory within the FPE simulated by the linear model could be interesting, it is unecessary for ISI statistics. We may therefore disregard all data from the IO simulation save for the exit time and point (points within the FPE are necessarily quiescent).
 
     \subsection{Current Results}
-    TODO
 
-    % Offending distance check
+    % Find and verify FPE
+    A first order of business for developing \textit{Model B}, the generalized term for Model B1/B2, is to find a suitable FPE radius $r$ and verify that indeed $\Omega_1 \subset \text{int}(F)$ and $\Omega_2 \subset \text{int}(F)^c$. To verify the latter, we first define what a valid DO oscillation is: alternating left to right (i.e. increasing $v$) $L$ and right to left (i.e. decreasing $v$) $L'$ crossings. The numerical specifications of such crossings was described in \refsec{sec:pmap-numerical}.
+
+    % Offending distance
+    Any invalid crossing of $L$ or $L'$ (e.g. wrong direction or not alternating) is known as an \textit{offending crossing}. The norm of the offending crossing in $\tilde{\mathbf{x}}$ space is known as the \textit{offending distance}. The offending distance therefore gives a measure of how far from the origin a trajectory is before it becomes invalid. We can then gather offending distances for various starting $\psi$ and construct a histogram, as in \reffig{fig:off-dist}. From this, we can define a radius $r$ for the FPE such that these offending distances are less than $r$. That would make us reasonably sure that $\Omega_2 \subset \text{int}(F)^c$. Looking at \reffig{fig:off-dist}, we pick $r = 30$.
+
+    % Offending distance histogram
     \begin{figure}[h]
 
         \centering
  
         \centerfig{0.8}{off-dist.jpg}
     
-        \captionsetup{width=0.8\linewidth}
-        \ccaption{TODO}
+        \captionsetup{width=0.75\linewidth}
+        \ccaption{Histogram of offending distances for offending crossings in the DO state. A total of 4000 trials were executed for various starting points $\psi \in L$ and $\psi' \in L'$.}
         \label{fig:off-dist}
     
     \end{figure}
 
-    % FPE in ULC check. linearity check partly covered in D/E map
-    % 
-    
-    % D map, E map
+    % FPE in ULC check
+    Since the FPE is defined with $r = 30$, all that remains is to confirm $\Omega_1 \subset \text{int}(F)$ to verify the validity of the FPE. This is equivalent to checking that the linear model is accurate inside $F$. One necessary but not sufficient condition is that the FPE must be inside the ULC. This is seen to be true in \reffig{fig:fpe-ulc}.
+    \begin{figure}[h]
 
-    % also mention code...
+        \centering
+ 
+        \centerfig{0.8}{fpe-ulc.jpg}
+    
+        \captionsetup{width=0.7\linewidth}
+        \ccaption{Comparison of ULC and FPE contours, with an FPE radius of 30 in $\tilde{\mathbf{x}}$ space.}
+        \label{fig:fpe-ulc}
+    
+    \end{figure}
+    
+    % D/E maps
+    To further verify the linear model, we can compare its statistics with those of the CLT and Jacobi models. Of course, the ISI distribution cannot be used since the linear model does not exhibit spiking (it is only valid near the fixed point, after all). We can, however, compare $P$ and $T$ distributions for a given starting point on $C$ in the IO state of Model B2. The subdistributions for exiting through the $D$ and $E$ sections from a given starting point on $C$ are depicted in \reffig{fig:de-map}. Note that $\alpha$ is used as an alias for $\theta$ on the curve $C$ to distinguish from points along $E$ also parametrized by $\theta$.
+    \begin{figure}[!h]
+
+        \centering
+
+        \begin{subfigure}{0.72\textwidth}
+            \includegraphics[width=\linewidth]{img/dmap.jpg}
+            \caption{$D$ exit subdistribution}
+        \end{subfigure}
+    
+        \begin{subfigure}{0.72\textwidth}
+            \includegraphics[width=\linewidth]{img/emap.jpg}
+            \caption{$E$ exit subdistribution}
+        \end{subfigure}
+        
+        \captionsetup{width=\linewidth}
+        \ccaption{$D$ and $E$ exit subdistributions for the IO state. Each trial starts at the point $\theta = 0$ on the curve $C$. Each of the 2000 trials, performed for all three methods, are represented as a dot. Finally, the ``nonlinear'' method in these plots is the CLT model.}
+        \label{fig:de-map}
+
+    \end{figure}
+
+    % Discussion of D/E map results
+    Qualitatively, the subdistributions in \reffig{fig:de-map} seem to roughly agree with each other. This not only supports the linear approximation, but also confirms the similarity between the Jacobi and CLT models. A more quantitative measure of similarity between these subdistributions has yet to be devised.
+
+    % Code
+    The script for checking offending distances for the DO state can be found in \texttt{scripts.docheck}. Variables of interest to change include \texttt{Nk}, \texttt{trials} (the number of trials executed for each $\psi$ and $\psi'$), \texttt{psi\_range} (the values of starting $\psi$ along $L$), and \texttt{psip\_range} (the values of starting $\psi'$ along $L'$). Meanwhile, the \texttt{scripts.contour} script was used to compare the FPE and ULC. A possible variable to change here is \texttt{cdist}, which is simply the radius $r$ of the FPE in $\tilde{\mathbf{x}}$ space, should a different FPE size be desired. Finally, the script \texttt{scripts.elstats} can be used to generate statistics on the FPE, as in \reffig{fig:de-map}. The starting point \texttt{alpha} and trial count \texttt{trials} could be parameters to change here. The reader is encouraged to run the \texttt{scripts.elstats} on different values of $\alpha$ to get more data.
 
     \pagebreak
 
