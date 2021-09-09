@@ -1261,10 +1261,10 @@
     The $\psi_b$ parameter is a cutoff that distinguishes probable spiking (distinct subthreshold) and approximately certain spiking (spiking oscillations). A refinement of Model B1--creatively named Model B2--then eliminates a bit of complexity by combining the distinct subthreshold and spiking oscillations states into one state, known as the \textit{distinct oscillations} (DO) state. To be consistent with the naming, the indistinct subthreshold state is renamed to being the \textit{indistinct oscillations} (IO) state.
 
     % How DO behaves
-    The state transitions of Model B2 are the similar to that of Model B1, but with the merged states as we have described. A second distinction that will be subsequently described is how the IO state transitions to the DO state. Meamwhile, the evolution of the DO state is the similar to the evolution of the distinct subthreshold state in Model B1. Hence the only effective difference is that we no longer assume guarenteed spiking for $\psi > \psi_b$ (and thereby circumvent the need to fit $\psi_b$).
+    The evolution of the DO state is the similar to the evolution of the distinct subthreshold state in Model B1, where spiking probabilities and conditional $P(\psi), T(\psi)$ are computed to determine the spike times (and eventually the ISIs). Meanwhile, transitions into the IO state can be defined as entrances into the FPE.
 
     % How IO behaves
-    The IO state still obeys the linearized SDE in (\ref{eqn:mll}). However, rather than waiting to cross the $L$ section to change states, we could instead enforce a transition whenever $F$ is exited. This avoids the possible (albeit unlikely) scenario in \reffig{fig:modelb1-fpe-fail} that Model B1 fails to capture, where the indistinct subthreshold state simulates the system beyond the valid region.
+    Now, the IO state still obeys the linearized SDE in (\ref{eqn:mll}). However, rather than waiting to cross the $L$ section to change states, we could instead enforce a transition whenever $F$ is exited. This avoids the possible (albeit unlikely) scenario in \reffig{fig:modelb1-fpe-fail} that Model B1 fails to capture, where the indistinct subthreshold state simulates the system beyond the valid region.
     \begin{figure}[h]
 
         \centering
@@ -1292,7 +1292,7 @@
     \end{figure}
     
     % Exit points
-    Now instead of tracking exit points through $C$ and $E$, we can track exit points through $D$ and $E$. The advantage is that an exit point through $D$ is straightforward to transition into the DO state, whereas an exit point through $C$ will require yet another statistical map of points along $L$ to initiate the DO state in. A disadvantage, of course, is that an exit point through $D$ risks leaving $\Omega_1$ as \reffig{fig:modelb2-fpe-fail} illustrates. The hope is that such occurences are infrequent, however.
+    Instead of tracking exit points through $C$ and $E$, we can track exit points through $D$ and $E$. The advantage is that an exit point through $D$ is straightforward to transition into the DO state, whereas an exit point through $C$ will require yet another statistical map of points along $L$ to initiate the DO state in. A disadvantage, of course, is that an exit point through $D$ risks leaving $\Omega_1$ as \reffig{fig:modelb2-fpe-fail} illustrates. The hope is that such occurences are infrequent, however.
     \begin{figure}[h]
 
         \centering
@@ -1314,8 +1314,29 @@
     % Why we aren't looking at C
     Tracking exits through $E$ and not $C$ is justified by noting that the partial oscillation crossing $E$ could spike or be quiescent, rendering the $E$ exit non-trivial in terms of ISIs. In contrast, partial oscillations exiting through $C$ will have either spiked or been quiescent \textit{already}, so there are not many interesting details beyond $C$ (other than the potential breakdown of the linear approximation).
 
+    % Entrances
+    As for entrances into the FPE, we can again estimate conditional $P$ and $T$ maps, and keep track of where along the TODO
+
     \subsection{Current Results}
-    T
+    TODO
+
+    % Offending distance check
+    \begin{figure}[h]
+
+        \centering
+ 
+        \centerfig{0.8}{off-dist.jpg}
+    
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{TODO}
+        \label{fig:off-dist}
+    
+    \end{figure}
+
+    % FPE in ULC check. linearity check partly covered in D/E map
+    % 
+    
+    % D map, E map
 
     % also mention code...
 
