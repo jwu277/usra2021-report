@@ -1048,7 +1048,7 @@
     The script used to generate the various Poincare statistics in \reffig{fig:poincare} can be found in \texttt{scripts.poincare}. Variables of interest to change are \texttt{Nk}, \texttt{psi\_range} (which defines the values of $\psi$ to be probed) and \texttt{trials} (the number of trials to perform). 
     
     % Code: pdist
-    Meanwhile, the script used to generate the distributions of $P(\psi)$ for specific values of $\psi$ is contained in \texttt{scripts.pdist}. This script additionally generates histograms for $T(\psi)$ and spiking frequency for fixed $\psi$. Some variables to change here include \texttt{Nk}, \texttt{psi}, and \texttt{trials}.
+    Meanwhile, the script used to generate the distributions of $P(\psi)$ for specific values of $\psi$ is contained in \texttt{scripts.pdist}. This script additionally generates histograms for $T(\psi)$ and spiking frequency for fixed $\psi$. Some variables to change here include \texttt{Nk}, \texttt{psi}, and \texttt{trials}. The reader is encouraged to run these scripts for themselves should they wish to collect more data (e.g. with different parameters) or reproduce these results.
 
     \pagebreak
 
@@ -1182,7 +1182,7 @@
     \subsection{Numerical Comparison}
 
     % Deterministic comparison
-    A comparison of the Euler-Maruyama, Jacobi, and linear models for a deterministic Morris-Lecar neuron is given in \reffig{fig:det-comp}. Since the Euler-Maruyama and Jacobi models differ only in the noise term, the two have the same deterministic dynamics. Otherwise, the linear and nonlinear models appear to exhibit similar behaviour (at least, qualitatively) near the fixed point for the trajectories in \reffig{fig:det-comp}. A comparison of these models with a stochastic neuron is given later in this report.
+    A comparison of the CLT (\ref{eqn:ml-stochastic})-(\ref{eqn:ml-stochastic-end}), Jacobi, and linear models for a deterministic Morris-Lecar neuron is given in \reffig{fig:det-comp}. Since the CLT and Jacobi models differ only in the noise term, the two have the same deterministic dynamics. Otherwise, the linear and nonlinear models appear to exhibit similar behaviour (at least, qualitatively) near the fixed point for the trajectories in \reffig{fig:det-comp}. A comparison of these models with a stochastic neuron is given later in this report.
     \begin{figure}[h]
 
         \centering
@@ -1190,7 +1190,7 @@
         \centerfig{0.8}{det-comp.jpg}
     
         \captionsetup{width=0.85\linewidth}
-        \ccaption{Comparison of quisecent deterministic trajectories for nonlinear (Euler-Maruyama and Jacobi) and linear models of the Morris-Lecar neuron. The fixed point ellipse (FPE) is defined later in the report.}
+        \ccaption{Comparison of quisecent deterministic trajectories for nonlinear (CLT and Jacobi) and linear models of the Morris-Lecar neuron. The fixed point ellipse (FPE) is defined later in the report.}
         \label{fig:det-comp}
     
     \end{figure}
@@ -1204,21 +1204,73 @@
     \pagebreak
 
     \section{Patched Model}
-    % TODO
 
-    \subsection{Description}
-    D
+    \subsection{Description and Motivation}
 
-    \subsection{Motivation}
-    S
+    % Poincare map
+    One aspect of primary interest to investigate for neuron models is the ISI distribution. In simulating ISI histograms, we only care about the occurences and durations of spiking and quiescent oscillations, and not the precise trajectory within these classifications. Therefore, we might expect that a Poincare map model can be used, where we track only the $\psi$ value for each oscillation and infer (probabilistically) whether a given oscillation is spiking or quiescent. Such a model would be simpler and computationally easier than a system of stochastic equations (e.g. the CLT and Jacobi models).
+
+    % pmap failure near fixed point
+    Typically, we expect oscillations to cross through the $L$ and $L'$ sections in an alternating and counterclockwise fashion, as in \reffig{fig:valid}. However, this Poincare map description can break down near the fixed point, such as in \reffig{fig:invalid-l}. There the size of the oscillation in the phase plane is small enough for the stochastic noise to compress it vertically by an appreciable proportion. In this example, the ``squishing'' of the oscillation causes it to cross through the $L$ section from right to left rather than crossing through the $L'$ section from right to left.
+    \begin{figure}[h]
+
+        \centering
+    
+        % valid
+        \begin{subfigure}{0.49\textwidth}
+            \centerfig{0.6}{valid.jpg}
+            \caption{A valid oscillation}
+            \label{fig:valid}
+        \end{subfigure}
+        % invalid-l
+        \begin{subfigure}{0.49\textwidth}
+            \centerfig{0.6}{invalid-l.jpg}
+            \caption{An invalid oscillation}
+            \label{fig:invalid-l}
+        \end{subfigure}
+    
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{Valid and invalid Morris-Lecar oscillations for the Poincare map model. The red cross is the fixed point. Meanwhile, the green line below the fixed point is $L$, and the blue line above the fixed point is $L'$.}
+        \label{fig:pmap-fail}
+    
+    \end{figure}
+    This is ``double-counting'' of an oscillation unacceptable if we are to model each Poincare crossing as a single oscillation. Other consequences of such invalid oscillations include $T(\psi)$ being recorded as roughly half of what it should be and $P(\psi)$ being mapped to smaller values of $\psi$ than we would intuitively expect.
+
+    % Remedy = linear model
+    Luckily, near the fixed point the linear model becomes valid. This ought to still be easier than using a nonlinear model--perhaps some results of the system near the fixed point can be deduced analytically using the linear approximation. We may therefore adopt a hybrid approach to a simplified model of the Morris-Lecar neuron; the linear model near the fixed point and the Poincare model away from it. One requisite is that the region $\Omega_1$ containing the fixed point in which the linear approximation holds well and the region $\Omega_2$ outside of the fixed point where the Poincare map is virtually free of invalid oscillations must cover the entire phase plane (or at least all reasonable values of $(v, w)$ for the system).
+
+    % E is a circle in x~~
+    One way to construct the hybrid model is to define a region $E$ such that $\Omega_1 \subset E$ and $\Omega_2 \subset E^c$. Since the system is (factoring out $R_{\omega t}$ rotations) isotropic in $\mathbf{\tilde{x}}$ coordinates, we define $E$ to be a circle of radius $r$ in that space. This means that $E$ is an ellipse in $(v, w)$ coordinates:
+    \begin{equation}
+        E = \left\{r\mathbf{Q}\qvec{\cos\theta}{\sin\theta}, \quad -\pi \leq \theta < \pi\right\}
+    \end{equation}
+
+    % Model B1
+    The inspiration for a patched model was proposed by Professor Nagata. From his ideas, I have developed an initial model, known as ``Model B1,'' in the file \texttt{scripts/modelb.py}. Model B1 operates in three states: \textit{indistinct subthreshold}, \textit{distinct subthreshold}, and \textit{spiking oscillations}. The operation within each state and the transitions between the states are defined as follows:
+    \begin{itemize}
+        \item \textbf{Indistinct subthreshold:} The system behaves as in the linear model until it cross $L$ at a point outside of $E$. In this case, if $\psi \leq \psi_b$, the state becomes the distinct subthreshold state, where $\psi_b$ is a cutoff parameter. Otherwise if $\psi < \psi_b$, the state becomes the spiking oscillations state.
+        \item \textbf{Distinct subthreshold:} The state starts at the $\psi$ value where the previous state left off. For a given $\psi_n$, whether the corresponding oscillation spikes is determined with probability $p(\psi_n)$ (which can be estimated from e.g. the spiking frequency histogram in \texttt{scripts.poincare}). The system then evolves to $\psi_{n+1} = P'(\psi_n)$, where $P'(\psi_n)$ is $P(\psi_n)$ conditioned on whether the oscillation spiked or not. Likewise, the duration of oscillation $n$ is $T'(\psi_n)$, where $T'(\psi_n)$ is $T(\psi_n)$ conditioned on the same thing. The system transitions to the indistinct subthreshold state when $\psi$ is inside $E$. On the other hand, the system transitions to the spiking oscillations state when $\psi > \psi_b$.
+        \item \textbf{Spiking oscillations:} The state evolves as it does in the distinct subthreshold. The difference here is that every oscillation spikes. The state transitions to the indistinct subthreshold state if $\psi$ is inside $E$ and otherwise transitions to the distinct subthreshold state if $\psi < \psi_b$.
+    \end{itemize}
+
+    % Model B2
+
+    % Two states
+    The $\psi_b$ parameter is a cutoff that distinguishes probable spiking (distinct subthreshold) and approximately certain spiking (spiking oscillations). A refinement of Model B1--creatively named Model B2--then eliminates a bit of complexity by combining the distinct subthreshold and spiking oscillations states into one state, known as the \textit{distinct oscillations} state. To be consistent with the naming, the indistinct subthreshold state is renamed to being the \textit{indistinct oscillations} state.
+
+    % How DO behaves
+    The state transitions of Model B2 are the same as that of Model B1, but with the merged states as we have described. The evolution of the distinct oscillations state is the same as the evolution of the distinct subthreshold state in Model B1. Hence the only effective difference is that we no longer assume guarenteed spiking for $\psi > \psi_b$ (and thereby circumvent the need to fit $\psi_b$).
 
     \subsection{Current Results}
     T
 
+    % also mention code...
+
     \pagebreak
 
     \section{Next Steps}
-    % TODO
+    T
+    % find ez results with lin model
 
     \pagebreak
 
