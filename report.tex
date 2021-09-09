@@ -1388,7 +1388,36 @@
     \pagebreak
 
     \section{Next Steps}
-    T
+    Some things that can be done in continuation of this project include:
+    \begin{enumerate}
+        \item Verifying $\Omega_1 \subset \text{int}(F)$
+        \begin{itemize}
+            \item Getting more data on the $D$ and $E$ exits for various values of $\alpha$. \texttt{scripts.elstats} can be used for this purpose.
+            \item Getting a quantitative measure of how the Poincare statistics differ between the linear, CLT, and Jacobi models.
+        \end{itemize}
+        \item Model B2 DO Dynamics
+        \begin{itemize}
+            \item Getting more data on Poincare statistics for $\psi$.
+            \item Potentially finding some sort of pattern in the Poincare statistics, and extrapolating to other $\psi$, other $(I, \phi)$, etc.
+        \end{itemize}
+        \item Model B2 IO-DO Transitions
+        \begin{itemize}
+            \item Collecting data on how points on $L$ in the DO state map to $C$ (DO to IO).
+            \item Collecting data on how points on $D$ and $E$ map to $L$ (IO to DO).
+        \end{itemize}
+        \item Implementing Model B2
+        \begin{itemize}
+            \item Using newly gathered data to update \texttt{neurons.modelb}.
+        \end{itemize}
+        \item ISI distribution
+        \begin{itemize}
+            \item Reproduce the ISI histograms in \reffig{fig:isih} to validate Model B2.
+            \item Possibly obtaining analytical results by leveraging the simplicity of Model B2 e.g. explanining exponential tail of ISI histogram with the linear model SDE.
+        \end{itemize}
+    \end{enumerate}
+
+    % model B stuff
+    % deeper checking
     % find ez results with lin model
 
     \pagebreak
