@@ -55,6 +55,7 @@
 \usepackage{subcaption}
 \usepackage{booktabs}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\usepackage[nottoc,numbib]{tocbibind}
 
 \usepackage{xcolor}
 \definecolor{lblue}{HTML}{D8FFFF}
@@ -154,10 +155,46 @@
 %%
 
 \begin{document}
-\begin{flushleft}
 
-    % TODO title page, etc.
-    % TODO header, footer formatting
+\begin{titlepage}
+    \begin{center}
+
+        \vspace*{1cm}
+            
+        \Huge
+        \textbf{USRA Project Report}
+            
+        \vspace{0.5cm}
+        \LARGE
+        Summer 2021
+            
+        \vspace{1.5cm}
+            
+        \textbf{James Wu}
+            
+        \vfill
+
+        \Large
+        
+        \textit{An investigation into the stochastic Morris-Lecar neuron in collaboration with Professor Wayne Nagata and Professor Priscilla Greenwood}
+            
+        \vspace{0.8cm}
+            
+        \centerfig{0.25}{ubc.jpg}
+            
+        \Large
+        Department of Mathematics \\
+        The University of British Columbia \\
+        Canada
+            
+    \end{center}
+\end{titlepage}
+
+\tableofcontents
+
+\pagebreak
+
+\begin{flushleft}
 
     \section{Preface}
 
