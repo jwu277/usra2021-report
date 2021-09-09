@@ -242,7 +242,7 @@
             \hline
             \texttt{scripts/isih.py} & ISI histogram generator for Morris-Lecar neuron & \\
             \hline
-            \texttt{scripts/izhikevich.py} & ISI distribution simulation for the Izhikevich neuron withPoisson current & Not really used and might have inconsistent units \\
+            \texttt{scripts/izhikevich.py} & ISI distribution simulation for the Izhikevich neuron with Poisson current & Not really used and might have inconsistent units \\
             \hline
             \texttt{scripts/lif.py} & ISI distribution simulation for the LIF neuron & \\
             \hline
@@ -627,7 +627,7 @@
         \centerfig{0.8}{phi-im-scale.jpg}
     
         \captionsetup{width=0.8\linewidth}
-        \ccaption{Comparison of fit power law scaling and actual numerical data for $\omega(\phi)$ at small $\phi$. The fit obeys the equation $\omega = 0.4\sqrt{\phi}$.}
+        \ccaption{Comparison of power law fit scaling and actual numerical data for $\omega(\phi)$ at small $\phi$. The fit obeys the equation $\omega = 0.4\sqrt{\phi}$.}
         \label{fig:phi-im-scale}
     
     \end{figure}
@@ -1119,6 +1119,7 @@
     % Linear equation
     Near the fixed point, we can expand (\ref{eqn:ml-stochastic}) as a linear model as in \cite{dg}. Since the deterministic part is zero to zeroth order, we expand it to first order. In contrast, the stochastic part $h(v, w)$ is nonzero to zeroth order, so we need only expand that to zeroth order. That gets us
     \begin{equation}
+        \label{eqn:mll}
         \qvec{v}{w}' \approx \mathbf{M} \qvec{v}{w} dt + \qvec{0}{\frac{0.1003}{\sqrt{N_K}} dB_t}
     \end{equation}
     Here we used the value of (\ref{eqn:h-eq}) for the stochastic part. Meanwhile, $\mathbf{M}$ is the Jacobian matrix of the dynamic part in (\ref{eqn:ml-stochastic}):
@@ -1230,7 +1231,7 @@
         \end{subfigure}
     
         \captionsetup{width=0.8\linewidth}
-        \ccaption{Valid and invalid Morris-Lecar oscillations for the Poincare map model. The red cross is the fixed point. Meanwhile, the green line below the fixed point is $L$, and the blue line above the fixed point is $L'$.}
+        \ccaption{Valid and invalid Morris-Lecar oscillations for the Poincare map model. The red cross is the fixed point. Meanwhile, the green line below the fixed point is $L$, and the blue line above the fixed point is $L'$. The trajectories are in black.}
         \label{fig:pmap-fail}
     
     \end{figure}
@@ -1240,26 +1241,78 @@
     Luckily, near the fixed point the linear model becomes valid. This ought to still be easier than using a nonlinear model--perhaps some results of the system near the fixed point can be deduced analytically using the linear approximation. We may therefore adopt a hybrid approach to a simplified model of the Morris-Lecar neuron; the linear model near the fixed point and the Poincare model away from it. One requisite is that the region $\Omega_1$ containing the fixed point in which the linear approximation holds well and the region $\Omega_2$ outside of the fixed point where the Poincare map is virtually free of invalid oscillations must cover the entire phase plane (or at least all reasonable values of $(v, w)$ for the system).
 
     % E is a circle in x~~
-    One way to construct the hybrid model is to define a region $E$ such that $\Omega_1 \subset E$ and $\Omega_2 \subset E^c$. Since the system is (factoring out $R_{\omega t}$ rotations) isotropic in $\mathbf{\tilde{x}}$ coordinates, we define $E$ to be a circle of radius $r$ in that space. This means that $E$ is an ellipse in $(v, w)$ coordinates:
+    One way to construct the hybrid model is to define a boundary $F$ such that $\Omega_1 \subset \text{int}(F)$ and $\Omega_2 \subset \text{int}(F)^c$, where $\text{int}(F)$ is the interior of $F$. Since the system is (factoring out $R_{\omega t}$ rotations) isotropic in $\mathbf{\tilde{x}}$ coordinates, we define $F$ to be a circle of radius $r$ in that space. This means that $F$ is an ellipse in $(v, w)$ coordinates:
     \begin{equation}
-        E = \left\{r\mathbf{Q}\qvec{\cos\theta}{\sin\theta}, \quad -\pi \leq \theta < \pi\right\}
+        F = \left\{r\mathbf{Q}\qvec{\cos\theta}{\sin\theta}, \quad -\pi \leq \theta < \pi\right\}
     \end{equation}
+    $F$ is sometimes referred to as the \textit{fixed point ellipse} (FPE).
 
     % Model B1
     The inspiration for a patched model was proposed by Professor Nagata. From his ideas, I have developed an initial model, known as ``Model B1,'' in the file \texttt{scripts/modelb.py}. Model B1 operates in three states: \textit{indistinct subthreshold}, \textit{distinct subthreshold}, and \textit{spiking oscillations}. The operation within each state and the transitions between the states are defined as follows:
     \begin{itemize}
-        \item \textbf{Indistinct subthreshold:} The system behaves as in the linear model until it cross $L$ at a point outside of $E$. In this case, if $\psi \leq \psi_b$, the state becomes the distinct subthreshold state, where $\psi_b$ is a cutoff parameter. Otherwise if $\psi < \psi_b$, the state becomes the spiking oscillations state.
-        \item \textbf{Distinct subthreshold:} The state starts at the $\psi$ value where the previous state left off. For a given $\psi_n$, whether the corresponding oscillation spikes is determined with probability $p(\psi_n)$ (which can be estimated from e.g. the spiking frequency histogram in \texttt{scripts.poincare}). The system then evolves to $\psi_{n+1} = P'(\psi_n)$, where $P'(\psi_n)$ is $P(\psi_n)$ conditioned on whether the oscillation spiked or not. Likewise, the duration of oscillation $n$ is $T'(\psi_n)$, where $T'(\psi_n)$ is $T(\psi_n)$ conditioned on the same thing. The system transitions to the indistinct subthreshold state when $\psi$ is inside $E$. On the other hand, the system transitions to the spiking oscillations state when $\psi > \psi_b$.
-        \item \textbf{Spiking oscillations:} The state evolves as it does in the distinct subthreshold. The difference here is that every oscillation spikes. The state transitions to the indistinct subthreshold state if $\psi$ is inside $E$ and otherwise transitions to the distinct subthreshold state if $\psi < \psi_b$.
+        \item \textbf{Indistinct subthreshold:} The system behaves as in the linear model until it cross $L$ at a point outside of $F$. In this case, if $\psi \leq \psi_b$, the state becomes the distinct subthreshold state, where $\psi_b$ is a cutoff parameter. Otherwise if $\psi < \psi_b$, the state becomes the spiking oscillations state.
+        \item \textbf{Distinct subthreshold:} The state starts at the $\psi$ value where the previous state left off. For a given $\psi_n$, whether the corresponding oscillation spikes is determined with probability $p(\psi_n)$ (which can be estimated from e.g. the spiking frequency histogram in \texttt{scripts.poincare}). The system then evolves to $\psi_{n+1} = P'(\psi_n)$, where $P'(\psi_n)$ is $P(\psi_n)$ conditioned on whether the oscillation spiked or not. Likewise, the duration of oscillation $n$ is $T'(\psi_n)$, where $T'(\psi_n)$ is $T(\psi_n)$ conditioned on the same thing. The system transitions to the indistinct subthreshold state when $\psi$ is inside $F$. On the other hand, the system transitions to the spiking oscillations state when $\psi > \psi_b$.
+        \item \textbf{Spiking oscillations:} The state evolves as it does in the distinct subthreshold. The difference here is that every oscillation spikes. The state transitions to the indistinct subthreshold state if $\psi$ is inside $F$ and otherwise transitions to the distinct subthreshold state if $\psi < \psi_b$.
     \end{itemize}
 
     % Model B2
 
     % Two states
-    The $\psi_b$ parameter is a cutoff that distinguishes probable spiking (distinct subthreshold) and approximately certain spiking (spiking oscillations). A refinement of Model B1--creatively named Model B2--then eliminates a bit of complexity by combining the distinct subthreshold and spiking oscillations states into one state, known as the \textit{distinct oscillations} state. To be consistent with the naming, the indistinct subthreshold state is renamed to being the \textit{indistinct oscillations} state.
+    The $\psi_b$ parameter is a cutoff that distinguishes probable spiking (distinct subthreshold) and approximately certain spiking (spiking oscillations). A refinement of Model B1--creatively named Model B2--then eliminates a bit of complexity by combining the distinct subthreshold and spiking oscillations states into one state, known as the \textit{distinct oscillations} (DO) state. To be consistent with the naming, the indistinct subthreshold state is renamed to being the \textit{indistinct oscillations} (IO) state.
 
     % How DO behaves
-    The state transitions of Model B2 are the same as that of Model B1, but with the merged states as we have described. The evolution of the distinct oscillations state is the same as the evolution of the distinct subthreshold state in Model B1. Hence the only effective difference is that we no longer assume guarenteed spiking for $\psi > \psi_b$ (and thereby circumvent the need to fit $\psi_b$).
+    The state transitions of Model B2 are the similar to that of Model B1, but with the merged states as we have described. A second distinction that will be subsequently described is how the IO state transitions to the DO state. Meamwhile, the evolution of the DO state is the similar to the evolution of the distinct subthreshold state in Model B1. Hence the only effective difference is that we no longer assume guarenteed spiking for $\psi > \psi_b$ (and thereby circumvent the need to fit $\psi_b$).
+
+    % How IO behaves
+    The IO state still obeys the linearized SDE in (\ref{eqn:mll}). However, rather than waiting to cross the $L$ section to change states, we could instead enforce a transition whenever $F$ is exited. This avoids the possible (albeit unlikely) scenario in \reffig{fig:modelb1-fpe-fail} that Model B1 fails to capture, where the indistinct subthreshold state simulates the system beyond the valid region.
+    \begin{figure}[h]
+
+        \centering
+ 
+        \centerfig{0.8}{modelb1-fpe-fail.jpg}
+    
+        \captionsetup{width=0.85\linewidth}
+        \ccaption{An undesirable scenario that could occur in Model B1. Here $\Sigma$ is the hypothetical boundary of $\Omega_1$. On a different note, the trajectory is in black.}
+        \label{fig:modelb1-fpe-fail}
+    
+    \end{figure}
+
+    % Dissected FPE
+    However, instead of looking directly at exit points on $F$, we instead dissect $F$ and $L$ as in         \reffig{fig:fpe-dissect}. Here we define $C = F \cap \{v < v_{eq}\}$, $E = F \cap \{v > v_{eq}\}$, and $D = L \setminus \text{int}(F)$.
+    \begin{figure}[h]
+
+        \centering
+ 
+        \centerfig{0.6}{fpe-dissect.jpg}
+    
+        \captionsetup{width=0.9\linewidth}
+        \ccaption{Diagram of contours for IO transitions by Professor Nagata. $C$ and $E$ are the left and right halves of the FPE (i.e. have $v < v_{eq}$ and $v > v_{eq}$), respectively. $D$ is the section of $L$ outside of $F$. That is, $D = L \setminus \text{int}(F)$.}
+        \label{fig:fpe-dissect}
+    
+    \end{figure}
+    
+    % Exit points
+    Now instead of tracking exit points through $C$ and $E$, we can track exit points through $D$ and $E$. The advantage is that an exit point through $D$ is straightforward to transition into the DO state, whereas an exit point through $C$ will require yet another statistical map of points along $L$ to initiate the DO state in. A disadvantage, of course, is that an exit point through $D$ risks leaving $\Omega_1$ as \reffig{fig:modelb2-fpe-fail} illustrates. The hope is that such occurences are infrequent, however.
+    \begin{figure}[h]
+
+        \centering
+ 
+        \centerfig{0.8}{modelb2-fpe-fail.jpg}
+    
+        \captionsetup{width=0.8\linewidth}
+        \ccaption{An undesirable scenario that could occur in Model B2 (as well as Model B1). Here $\Sigma$ is the hypothetical boundary of $\Omega_1$. On a different note, the trajectory is in black.}
+        \label{fig:modelb2-fpe-fail}
+    
+    \end{figure}
+
+    % E exit
+    Recall that $F$ is a circle in $\tilde{\mathbf{x}}$ space, so we can parametrize $F$ by an angle $\theta$. Restricting $\theta$ to the appropriate interval $\mathcal{I}_E$ therefore parametrizes $E$. We can then define the Poincare-like map $P_E : \mathcal{I}_E \to \mathbb{R}^+$, where $\psi = P_E(\theta)$ is a random variable for a fixed value of $\theta$ that represents the next Poincare crossing of $L$. We can likewise define firing probabilities and conditional $P_E$ and $T_E$ (for partial oscillation time) functions depending on whether the partial oscillation has fired.
+
+    % L' statistics
+    One possible avenue of further investigation is to look at using $L'$ to support Model B2. This could be done by defining $P_E(\theta)$, $T_E(\theta)$, etc. to be the next Poincare crossing of $L'$ instead of $L$. Another set of maps (e.g. $P_{L'}$, $T_{L'}$, etc.) can then be used to traverse back to $L$. Although this would probably just complicate the model, we could hope that dealing with $L'$ is easier, and that the $E$ to $L'$ journey is more manageable (numerically and perhaps analytically) with the intermediate trajectory being shorter than going from $E$ to $L$.
+
+    % Why we aren't looking at C
+    Tracking exits through $E$ and not $C$ is justified by noting that the partial oscillation crossing $E$ could spike or be quiescent, rendering the $E$ exit non-trivial in terms of ISIs. In contrast, partial oscillations exiting through $C$ will have either spiked or been quiescent \textit{already}, so there are not many interesting details beyond $C$ (other than the potential breakdown of the linear approximation).
 
     \subsection{Current Results}
     T
